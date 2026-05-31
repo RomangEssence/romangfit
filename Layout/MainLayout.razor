@@ -1,3 +1,27 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<div class="blazor-custom-reset">
+    @Body
+</div>
+
+<style>
+    /* Blazor 기본 템플릿의 사이드바 및 레이아웃 강제 초기화 */
+    .page {
+        display: block !important;
+        flex-direction: unset !important;
+    }
+
+    main {
+        width: 100% !important;
+    }
+
+    .sidebar {
+        display: none !important;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #EBF3FF;
+    }
+</style>
