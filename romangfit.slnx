@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path="deploy.yml" />
+  </Folder>
+  <Project Path="romangfit.csproj" />
+</Solution>

@@ -1,0 +1,97 @@
+﻿@page "/"
+@inject IJSRuntime JS
+@using System.Text.Json
+
+<div class="container p-3" style="max-width: 500px; background-color: #121212; color: white; min-height: 100vh; font-family: sans-serif;">
+    <h3 class="fw-bold text-success mb-4">romangfit</h3>
+
+    <div class="d-flex gap-2 mb-4">
+        <button class="btn btn-outline-light flex-fill" @onclick='() => SelectRoutine("밀기")'>밀기</button>
+        <button class="btn btn-outline-light flex-fill" @onclick='() => SelectRoutine("당기기")'>당기기</button>
+        <button class="btn btn-outline-light flex-fill" @onclick='() => SelectRoutine("하체")'>하체</button>
+    </div>
+
+    @if (currentWorkout != null)
+    {
+        <h5 class="text-warning mb-3">@currentWorkout.RoutineName 루틴 진행 중</h5>
+
+        @foreach (var exercise in currentWorkout.Exercises)
+        {
+            <div class="card bg-dark text-white mb-3 border-secondary">
+                <div class="card-body p-3">
+                    <h6 class="card-title fw-bold text-info">@exercise.Name</h6>
+
+                    @foreach (var set in exercise.Sets)
+                    {
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-3 text-secondary">@set.SetNumber세트</div>
+                            <div class="col-3">
+                                <input type="number" class="form-control form-control-sm bg-secondary text-white border-0 text-center" @bind="set.Weight" />
+                            </div>
+                            <div class="col-3">
+                                <input type="number" class="form-control form-control-sm bg-secondary text-white border-0 text-center" @bind="set.Reps" />
+                            </div>
+                            <div class="col-3 text-end">
+                                <input type="checkbox" class="form-check-input bg-dark border-secondary" style="width: 24px; height: 24px;" @bind="set.IsCompleted" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <button class="btn btn-success w-100 fw-bold my-4" @onclick="SaveWorkout">오늘 운동 종료 및 저장</button>
+    }
+</div>
+
+@code {
+    private DailyWorkout? currentWorkout;
+
+    private void SelectRoutine(string name)
+    {
+        currentWorkout = new DailyWorkout { RoutineName = name };
+        if (name == "밀기")
+        {
+            currentWorkout.Exercises.Add(new ExerciseLog { Name = "벤치프레스", Sets = CreateDefaultSets() });
+            currentWorkout.Exercises.Add(new ExerciseLog { Name = "오버헤드프레스", Sets = CreateDefaultSets() });
+        }
+        else if (name == "당기기")
+        {
+            currentWorkout.Exercises.Add(new ExerciseLog { Name = "데드리프트", Sets = CreateDefaultSets() });
+            currentWorkout.Exercises.Add(new ExerciseLog { Name = "풀업", Sets = CreateDefaultSets() });
+        }
+        else if (name == "하체")
+        {
+            currentWorkout.Exercises.Add(new ExerciseLog { Name = "스쿼트", Sets = CreateDefaultSets() });
+            currentWorkout.Exercises.Add(new ExerciseLog { Name = "레그프레스", Sets = CreateDefaultSets() });
+        }
+    }
+
+    private List<SetLog> CreateDefaultSets() => new()
+    {
+        new() { SetNumber = 1, Weight = 60, Reps = 10 },
+        new() { SetNumber = 2, Weight = 60, Reps = 10 },
+        new() { SetNumber = 3, Weight = 60, Reps = 10 }
+    };
+
+    private async Task SaveWorkout()
+    {
+        if (currentWorkout == null) return;
+
+        var existingJson = await JS.InvokeAsync<string>("localStorage.getItem", "workout_logs");
+        var logs = string.IsNullOrEmpty(existingJson)
+            ? new List<DailyWorkout>()
+            : JsonSerializer.Deserialize<List<DailyWorkout>>(existingJson) ?? new();
+
+        logs.Add(currentWorkout);
+
+        var updatedJson = JsonSerializer.Serialize(logs);
+        await JS.InvokeVoidAsync("localStorage.setItem", "workout_logs", updatedJson);
+
+        await JS.InvokeVoidAsync("alert", "득근 완료! 로컬 스토리지에 저장되었습니다.");
+    }
+
+    public class SetLog { public int SetNumber { get; set; } public double Weight { get; set; } public int Reps { get; set; } public bool IsCompleted { get; set; } }
+    public class ExerciseLog { public string Name { get; set; } = ""; public List<SetLog> Sets { get; set; } = new(); }
+    public class DailyWorkout { public DateTime Date { get; set; } = DateTime.Today; public string RoutineName { get; set; } = ""; public List<ExerciseLog> Exercises { get; set; } = new(); }
+}
