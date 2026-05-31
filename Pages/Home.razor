@@ -2,96 +2,349 @@
 @inject IJSRuntime JS
 @using System.Text.Json
 
-<div class="container p-3" style="max-width: 500px; background-color: #121212; color: white; min-height: 100vh; font-family: sans-serif;">
-    <h3 class="fw-bold text-success mb-4">romangfit</h3>
-
-    <div class="d-flex gap-2 mb-4">
-        <button class="btn btn-outline-light flex-fill" @onclick='() => SelectRoutine("밀기")'>밀기</button>
-        <button class="btn btn-outline-light flex-fill" @onclick='() => SelectRoutine("당기기")'>당기기</button>
-        <button class="btn btn-outline-light flex-fill" @onclick='() => SelectRoutine("하체")'>하체</button>
+<div class="app-container">
+    <div class="header d-flex justify-content-between align-items-center p-3 border-bottom border-secondary">
+        <h3 class="fw-bold text-mint m-0">romangfit</h3>
+        @if (isResting)
+        {
+            <div class="badge bg-danger fs-6 animate-pulse">⏳ 쉬는 시간: @restSeconds초</div>
+        }
     </div>
 
-    @if (currentWorkout != null)
-    {
-        <h5 class="text-warning mb-3">@currentWorkout.RoutineName 루틴 진행 중</h5>
-
-        @foreach (var exercise in currentWorkout.Exercises)
+    <div class="content p-3 pb-5 mb-5">
+        @if (currentTab == "routine")
         {
-            <div class="card bg-dark text-white mb-3 border-secondary">
-                <div class="card-body p-3">
-                    <h6 class="card-title fw-bold text-info">@exercise.Name</h6>
-
-                    @foreach (var set in exercise.Sets)
-                    {
-                        <div class="row g-2 align-items-center mb-2">
-                            <div class="col-3 text-secondary">@set.SetNumber 세트</div>
-                            <div class="col-3">
-                                <input type="number" class="form-control form-control-sm bg-secondary text-white border-0 text-center" @bind="set.Weight" />
-                            </div>
-                            <div class="col-3">
-                                <input type="number" class="form-control form-control-sm bg-secondary text-white border-0 text-center" @bind="set.Reps" />
-                            </div>
-                            <div class="col-3 text-end">
-                                <input type="checkbox" class="form-check-input bg-dark border-secondary" style="width: 24px; height: 24px;" @bind="set.IsCompleted" />
+            <h5 class="fw-bold mb-3 text-white">나의 운동 루틴</h5>
+            <div class="row g-3">
+                @foreach (var routine in predefinedRoutines)
+                {
+                    <div class="col-12">
+                        <div class="card bg-dark text-white border-secondary h-100">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold m-0 text-info">@routine.Key</h6>
+                                    <small class="text-secondary">@string.Join(", ", routine.Value.Select(e => e.Name))</small>
+                                </div>
+                                <button class="btn btn-mint btn-sm fw-bold text-dark" @onclick="() => StartRoutine(routine.Key)">선택</button>
                             </div>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         }
+        else if (currentTab == "active")
+        {
+            @if (currentWorkout == null)
+            {
+                <div class="text-center py-5">
+                    <p class="text-secondary">진행 중인 운동이 없습니다.</p>
+                    <button class="btn btn-outline-light btn-sm" @onclick='() => currentTab = "routine"'>루틴 선택하러 가기</button>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0 text-warning">🏋️ @currentWorkout.RoutineName 루틴</h5>
+                    <button class="btn btn-success btn-sm fw-bold" @onclick="SaveWorkout">운동 완료</button>
+                </div>
 
-        <button class="btn btn-success w-100 fw-bold my-4" @onclick="SaveWorkout">오늘 운동 종료 및 저장</button>
-    }
+                @foreach (var exercise in currentWorkout.Exercises)
+                {
+                    <div class="card bg-dark text-white mb-3 border-secondary rounded-3">
+                        <div class="card-header bg-transparent border-secondary d-flex justify-content-between align-items-center py-2">
+                            <span class="fw-bold text-mint">@exercise.Name</span>
+                            <small class="text-secondary">Total: @(exercise.Sets.Where(s => s.IsCompleted).Sum(s => s.Weight * s.Reps)) kg</small>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="row g-2 text-center text-secondary mb-1" style="font-size: 12px;">
+                                <div class="col-2">세트</div>
+                                <div class="col-3">kg</div>
+                                <div class="col-3">회</div>
+                                <div class="col-4">완료</div>
+                            </div>
+                            @foreach (var set in exercise.Sets)
+                            {
+                                <div class="row g-2 align-items-center mb-2 text-center">
+                                    <div class="col-2 text-secondary fw-bold">@set.SetNumber</div>
+                                    <div class="col-3">
+                                        <input type="number" class="form-control form-control-sm bg-dark-input text-white border-secondary text-center rounded-2" @bind="set.Weight" />
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="number" class="form-control form-control-sm bg-dark-input text-white border-secondary text-center rounded-2" @bind="set.Reps" />
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-sm w-100 fw-bold @(set.IsCompleted ? "btn-mint text-dark" : "btn-outline-secondary text-secondary")"
+                                                @onclick="() => ToggleSetComplete(set)">
+                                            @(set.IsCompleted ? "✓ 완료" : "대기")
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                            <button class="btn btn-outline-secondary btn-sm w-100 mt-2" @onclick="() => AddSet(exercise)">+ 세트 추가</button>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else if (currentTab == "history")
+        {
+            <h5 class="fw-bold mb-3 text-white">히스토리 및 통계</h5>
+            @if (!savedWorkouts.Any())
+            {
+                <p class="text-secondary text-center py-4">저장된 기록이 없습니다. 먼저 운동을 완료해 주세요!</p>
+            }
+            else
+            {
+                @foreach (var log in savedWorkouts.OrderByDescending(l => l.Date))
+                {
+                    <div class="card bg-dark text-white mb-2 border-secondary">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-info">@log.RoutineName 루틴</span>
+                                <span class="text-secondary small">@log.Date.ToString("yyyy-MM-dd HH:mm")</span>
+                            </div>
+                            <div class="small text-light">
+                                @foreach (var ex in log.Exercises)
+                                {
+                                    <div>• @ex.Name : @ex.Sets.Count(s => s.IsCompleted)세트 (@(ex.Sets.Where(s => s.IsCompleted).Sum(s => s.Weight * s.Reps)) kg)</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+
+    <div class="bottom-nav d-flex justify-content-around align-items-center border-top border-secondary">
+        <button class="nav-item-btn @(currentTab == "routine" ? "active" : "")" @onclick='() => currentTab = "routine"'>
+            <span>📋</span><small>루틴</small>
+        </button>
+        <button class="nav-item-btn @(currentTab == "active" ? "active" : "")" @onclick='() => currentTab = "active"'>
+            <span>🏋️</span><small>기록하기</small>
+        </button>
+        <button class="nav-item-btn @(currentTab == "history" ? "active" : "")" @onclick='() => currentTab = "history"'>
+            <span>📊</span><small>통계</small>
+        </button>
+    </div>
 </div>
 
-@code {
-    private DailyWorkout? currentWorkout;
+<style>
+    :root {
+        --mint-color: #00f0a0;
+        --bg-dark: #121212;
+        --bg-card: #1e1e1e;
+        --bg-input: #2a2a2a;
+    }
 
-    private void SelectRoutine(string name)
+    .app-container {
+        background-color: var(--bg-dark);
+        min-height: 100vh;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .text-mint {
+        color: var(--mint-color);
+    }
+
+    .btn-mint {
+        background-color: var(--mint-color);
+        color: #121212;
+    }
+
+        .btn-mint:hover {
+            background-color: #00d08a;
+        }
+
+    .bg-dark-input {
+        background-color: var(--bg-input) !important;
+    }
+
+    .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--bg-dark);
+        z-index: 1000;
+    }
+
+    .content {
+        margin-top: 65px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--bg-dark);
+        height: 60px;
+        z-index: 1000;
+    }
+
+    .nav-item-btn {
+        background: none;
+        border: none;
+        color: #888888;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 33%;
+        height: 100%;
+    }
+
+        .nav-item-btn.active {
+            color: var(--mint-color) !important;
+            fw-bold;
+        }
+
+        .nav-item-btn span {
+            font-size: 20px;
+        }
+
+    .animate-pulse {
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% {
+            opacity: 0.6;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0.6;
+        }
+    }
+</style>
+
+@code {
+    private string currentTab = "routine";
+    private DailyWorkout? currentWorkout;
+    private List<DailyWorkout> savedWorkouts = new();
+
+    // 타이머 상태 관리
+    private bool isResting = false;
+    private int restSeconds = 0;
+    private System.Threading.Timer? restTimer;
+
+    protected override async Task OnInitializedAsync()
     {
-        currentWorkout = new DailyWorkout { RoutineName = name };
-        if (name == "밀기")
+        await LoadHistoryFromStorage();
+    }
+
+    private void StartRoutine(string routineName)
+    {
+        currentWorkout = new DailyWorkout
         {
-            currentWorkout.Exercises.Add(new ExerciseLog { Name = "벤치프레스", Sets = CreateDefaultSets() });
-            currentWorkout.Exercises.Add(new ExerciseLog { Name = "오버헤드프레스", Sets = CreateDefaultSets() });
-        }
-        else if (name == "당기기")
+            RoutineName = routineName,
+            Date = DateTime.Now,
+            Exercises = predefinedRoutines[routineName].Select(e => new ExerciseLog
+            {
+                Name = e.Name,
+                Sets = e.Sets.Select(s => new SetLog { SetNumber = s.SetNumber, Weight = s.Weight, Reps = s.Reps }).ToList()
+            }).ToList()
+        };
+        currentTab = "active";
+    }
+
+    private void ToggleSetComplete(SetLog set)
+    {
+        set.IsCompleted = !set.IsCompleted;
+
+        if (set.IsCompleted)
         {
-            currentWorkout.Exercises.Add(new ExerciseLog { Name = "데드리프트", Sets = CreateDefaultSets() });
-            currentWorkout.Exercises.Add(new ExerciseLog { Name = "풀업", Sets = CreateDefaultSets() });
-        }
-        else if (name == "하체")
-        {
-            currentWorkout.Exercises.Add(new ExerciseLog { Name = "스쿼트", Sets = CreateDefaultSets() });
-            currentWorkout.Exercises.Add(new ExerciseLog { Name = "레그프레스", Sets = CreateDefaultSets() });
+            TriggerRestTimer(90); // 세트 완료 시 90초 타이머 자동 구동 (번핏 핵심 기능)
         }
     }
 
-    private List<SetLog> CreateDefaultSets() => new()
+    private void AddSet(ExerciseLog exercise)
     {
-        new() { SetNumber = 1, Weight = 60, Reps = 10 },
-        new() { SetNumber = 2, Weight = 60, Reps = 10 },
-        new() { SetNumber = 3, Weight = 60, Reps = 10 }
-    };
+        var lastSet = exercise.Sets.LastOrDefault();
+        int nextNum = (lastSet?.SetNumber ?? 0) + 1;
+        double nextWeight = lastSet?.Weight ?? 60;
+        int nextReps = lastSet?.Reps ?? 10;
+
+        exercise.Sets.Add(new SetLog { SetNumber = nextNum, Weight = nextWeight, Reps = nextReps });
+    }
+
+    private void TriggerRestTimer(int seconds)
+    {
+        restTimer?.Dispose();
+        restSeconds = seconds;
+        isResting = true;
+
+        restTimer = new System.Threading.Timer((state) =>
+                {
+                    InvokeAsync(() =>
+                    {
+                        if (restSeconds > 1)
+                        {
+                            restSeconds--;
+                            StateHasChanged();
+                        }
+                        else
+                        {
+                            isResting = false;
+                            restTimer?.Dispose();
+                            StateHasChanged();
+                        }
+                    });
+                }, null, 0, 1000);
+    }
 
     private async Task SaveWorkout()
     {
         if (currentWorkout == null) return;
 
-        var existingJson = await JS.InvokeAsync<string>("localStorage.getItem", "workout_logs");
-        var logs = string.IsNullOrEmpty(existingJson)
-            ? new List<DailyWorkout>()
-            : JsonSerializer.Deserialize<List<DailyWorkout>>(existingJson) ?? new();
+        savedWorkouts.Add(currentWorkout);
+        var json = JsonSerializer.Serialize(savedWorkouts);
+        await JS.InvokeVoidAsync("localStorage.setItem", "workout_logs", json);
 
-        logs.Add(currentWorkout);
-
-        var updatedJson = JsonSerializer.Serialize(logs);
-        await JS.InvokeVoidAsync("localStorage.setItem", "workout_logs", updatedJson);
-
-        await JS.InvokeVoidAsync("alert", "득근 완료! 로컬 스토리지에 저장 되었습니다.");
+        currentWorkout = null;
+        currentTab = "history";
+        await JS.InvokeVoidAsync("alert", "오늘도 고생하셨습니다. 안전하게 기록되었습니다!");
     }
 
+    private async Task LoadHistoryFromStorage()
+    {
+        var json = await JS.InvokeAsync<string>("localStorage.getItem", "workout_logs");
+        if (!string.IsNullOrEmpty(json))
+        {
+            savedWorkouts = JsonSerializer.Deserialize<List<DailyWorkout>>(json) ?? new();
+        }
+    }
+
+    // 데이터 구조 및 프리셋 백업 데이터
     public class SetLog { public int SetNumber { get; set; } public double Weight { get; set; } public int Reps { get; set; } public bool IsCompleted { get; set; } }
     public class ExerciseLog { public string Name { get; set; } = ""; public List<SetLog> Sets { get; set; } = new(); }
-    public class DailyWorkout { public DateTime Date { get; set; } = DateTime.Today; public string RoutineName { get; set; } = ""; public List<ExerciseLog> Exercises { get; set; } = new(); }
+    public class DailyWorkout { public DateTime Date { get; set; } = DateTime.Now; public string RoutineName { get; set; } = ""; public List<ExerciseLog> Exercises { get; set; } = new(); }
+
+    // 본인의 실전 루틴으로 가볍게 초기값 세팅 (미기/당기기/하체 프리셋)
+    private readonly Dictionary<string, List<ExerciseLog>> predefinedRoutines = new()
+    {
+        { "밀기 (Push)", new() {
+            new() { Name = "벤치프레스", Sets = new() { new(){SetNumber=1, Weight=60, Reps=10}, new(){SetNumber=2, Weight=60, Reps=10}, new(){SetNumber=3, Weight=60, Reps=10} } },
+            new() { Name = "오버헤드프레스", Sets = new() { new(){SetNumber=1, Weight=40, Reps=10}, new(){SetNumber=2, Weight=40, Reps=10} } }
+        }},
+        { "당기기 (Pull)", new() {
+            new() { Name = "데드리프트", Sets = new() { new(){SetNumber=1, Weight=100, Reps=5}, new(){SetNumber=2, Weight=100, Reps=5} } },
+            new() { Name = "바벨 로우", Sets = new() { new(){SetNumber=1, Weight=60, Reps=10}, new(){SetNumber=2, Weight=60, Reps=10} } }
+        }},
+        { "하체 (Legs)", new() {
+            new() { Name = "스쿼트", Sets = new() { new(){SetNumber=1, Weight=80, Reps=10}, new(){SetNumber=2, Weight=80, Reps=10}, new(){SetNumber=3, Weight=80, Reps=10} } }
+        }}
+    };
 }
