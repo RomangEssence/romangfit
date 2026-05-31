@@ -5,7 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>romangfit</title>
-    <base href="/romangfit/" />
+    <!--<base href="/romangfit/" />-->
+    <script>
+        var path = window.location.pathname;
+        // 깃허브 주소(romangfit 포함)면 해당 경로를, 로컬(localhost)이면 루트(/)를 자동으로 세팅
+        var baseHref = path.startsWith('/romangfit') ? '/romangfit/' : '/';
+        document.write('<base href="' + baseHref + '" />');
+    </script>
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/app.css" />
     <!-- If you add any scoped CSS files, uncomment the following to load them
