@@ -88,7 +88,7 @@
         var updatedJson = JsonSerializer.Serialize(logs);
         await JS.InvokeVoidAsync("localStorage.setItem", "workout_logs", updatedJson);
 
-        await JS.InvokeVoidAsync("alert", "득근 완료! 로컬 스토리지에 저장되었습니다.");
+        await JS.InvokeVoidAsync("alert", "득근 완료! 로컬 스토리지에 저장 되었습니다.");
     }
 
     public class SetLog { public int SetNumber { get; set; } public double Weight { get; set; } public int Reps { get; set; } public bool IsCompleted { get; set; } }
