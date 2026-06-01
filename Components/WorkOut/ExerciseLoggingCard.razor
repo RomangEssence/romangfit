@@ -1,0 +1,204 @@
+﻿@using romangfit.Models
+@inject Services.WorkoutStateService State
+
+<div class="card workout-card mb-3 border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+
+    <div class="p-3 cursor-pointer d-flex justify-content-between align-items-center unselectable" @onclick="ToggleExpand">
+        <h6 class="fw-bold text-dark m-0">
+            <span class="text-burn-blue me-2">@ContextExercise.SetNumber</span>
+            @ContextExercise.Category | @ContextExercise.Name
+        </h6>
+
+        <div class="d-flex align-items-center gap-3">
+            @if (!isExpanded)
+            {
+                <span class="text-secondary fw-bold" style="font-size: 13px; letter-spacing: -0.3px;">
+                    @CompletedSetsCount / @ContextExercise.Sets.Count SET
+                    @if (!ContextExercise.IsCardio)
+                    {
+                        <span class="ms-1 text-muted fw-normal">(@(TotalVolume)kg)</span>
+                    }
+                </span>
+            }
+            <span class="text-muted arrow-icon @(isExpanded ? "rotated" : "")">▼</span>
+        </div>
+    </div>
+
+    @if (isExpanded)
+    {
+        <div class="card-body pt-0 px-3 pb-3 animated-slide-down">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                @if (ContextExercise.IsCardio)
+                {
+                    <span class="small text-muted fw-bold">총 시간 @TotalCardioTime 분</span>
+                }
+                else
+                {
+                    <span class="small text-danger fw-bold">
+                        총 볼륨 @TotalVolume kg
+                        <span class="text-muted fw-normal" style="font-size: 11px;">(완료 세트 기준)</span>
+                    </span>
+                }
+                <button class="btn btn-light btn-sm text-secondary border rounded-pill px-2 py-0" style="font-size:11px;">최근 기록</button>
+            </div>
+
+            <input type="text" class="form-control memo-field mb-3" placeholder="메모 입력" @bind="ContextExercise.Memo" />
+
+            <div class="row g-2 text-center text-muted mb-2 small fw-bold border-bottom pb-2">
+                <div class="col-2">세트</div>
+                <div class="col-4">@(ContextExercise.IsCardio ? "시간" : "kg")</div>
+                <div class="col-3">@(ContextExercise.IsCardio ? "-" : "회")</div>
+                <div class="col-3">완료</div>
+            </div>
+
+            @foreach (var set in ContextExercise.Sets)
+            {
+                <div class="row g-2 align-items-center text-center mb-2">
+                    <div class="col-2">
+                        <span class="badge rounded-2 bg-light text-secondary w-100 py-2">@set.SetNumber</span>
+                    </div>
+                    <div class="col-4">
+                        @if (ContextExercise.IsCardio)
+                        {
+                            <input type="text" class="form-control form-control-sm text-center bg-light border-0 fw-bold" value="00:10:00" disabled />
+                        }
+                        else
+                        {
+                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Weight" />
+                        }
+                    </div>
+                    <div class="col-3">
+                        @if (!ContextExercise.IsCardio)
+                        {
+                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Reps" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </div>
+                    <div class="col-3">
+                        <button class="btn btn-sm w-100 rounded-2 border-0 @(set.IsCompleted ? "btn-burn-active text-white" : "btn-burn-inactive text-muted")"
+                                @onclick="() => ToggleSetCompletion(set)">
+                            ✓
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex gap-4 mt-3 justify-content-center">
+                <span class="text-secondary small cursor-pointer hover-link" @onclick="RemoveLastSet">— 세트삭제</span>
+                <span class="text-burn-blue small cursor-pointer hover-link" @onclick="AddNewSet">＋ 세트추가</span>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .text-burn-blue {
+        color: #2F80ED !important;
+    }
+
+    .memo-field {
+        border: 0;
+        background-color: #F2F4F7;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+
+    .btn-burn-inactive {
+        background-color: #F2F4F7;
+        color: #D0D5DD;
+    }
+
+    .btn-burn-active {
+        background-color: #2F80ED;
+        color: white;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .hover-link:hover {
+        opacity: 0.7;
+    }
+
+    .unselectable {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    /* 부드러운 화살표 회전 애니메이션 */
+    .arrow-icon {
+        display: inline-block;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 10px;
+    }
+
+        .arrow-icon.rotated {
+            transform: rotate(-180deg);
+        }
+
+    /* 열릴 때 부드럽게 내려오는 페이드 스무스 효과 */
+    .animated-slide-down {
+        animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        transform-origin: top;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: scaleY(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
+</style>
+
+@code {
+    [Parameter] public required Exercise ContextExercise { get; set; }
+
+    // 🌟 컴포넌트 내부 개별 확장/축소 상태 머신 변수 (기본값: 펼침)
+    private bool isExpanded = true;
+
+    private double TotalVolume => ContextExercise.Sets.Where(s => s.IsCompleted).Sum(s => s.Weight * s.Reps);
+    private double TotalCardioTime => ContextExercise.Sets.Where(s => s.IsCompleted).Sum(s => s.Duration.TotalMinutes);
+    private int CompletedSetsCount => ContextExercise.Sets.Count(s => s.IsCompleted);
+
+    private void ToggleExpand()
+    {
+        isExpanded = !isExpanded;
+    }
+
+    private void ToggleSetCompletion(SetLog set)
+    {
+        set.IsCompleted = !set.IsCompleted;
+        State.NotifyStateChanged();
+    }
+
+    private void AddNewSet()
+    {
+        var lastSet = ContextExercise.Sets.LastOrDefault();
+        ContextExercise.Sets.Add(new SetLog
+        {
+            SetNumber = ContextExercise.Sets.Count + 1,
+            Weight = lastSet?.Weight ?? 40,
+            Reps = lastSet?.Reps ?? 12,
+            Duration = lastSet?.Duration ?? TimeSpan.FromMinutes(10)
+        });
+        State.NotifyStateChanged();
+    }
+
+    private void RemoveLastSet()
+    {
+        if (ContextExercise.Sets.Count > 1)
+        {
+            ContextExercise.Sets.RemoveAt(ContextExercise.Sets.Count - 1);
+            State.NotifyStateChanged();
+        }
+    }
+}

@@ -1,0 +1,124 @@
+﻿@inject Services.WorkoutStateService State
+
+<div class="view-panel p-3 bg-white animated-fade flex-fill d-flex flex-column" style="height: 100%;">
+    <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
+        <span class="fs-4 cursor-pointer text-dark" @onclick='() => State.ChangeView("Dashboard")'>‹</span>
+        <h5 class="fw-bold m-0 text-dark">@DateTime.Today.ToString("M월 d일")</h5>
+        <span class="fs-4 cursor-pointer text-primary fw-bold" @onclick="State.StartNewRoutineCreation">＋</span>
+    </div>
+
+    <div class="d-flex text-center border-bottom tab-header mb-3" style="height: 35px;">
+        <div class="flex-fill pb-2 text-muted">직접 추가</div>
+        <div class="flex-fill pb-2 text-primary border-bottom border-primary border-3 fw-bold">내 루틴</div>
+        <div class="flex-fill pb-2 text-muted">불러오기</div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center text-muted mb-3" style="font-size: 13px;">
+        <span>전체 @State.Routines.Count 개</span>
+        <span>최근 저장순 ▾</span>
+    </div>
+
+    <div class="flex-fill" style="overflow-y: auto; padding-bottom: 70px; scrollbar-width: none;">
+        @foreach (var routine in State.Routines)
+        {
+            var rId = routine.Id;
+            var currentRoutine = routine; // 스코프 락
+
+            <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4 bg-light">
+                <div class="swipe-delete-action bg-danger d-flex align-items-center px-4 position-absolute start-0 top-0 h-100 cursor-pointer @(swipedRoutineId == rId ? "active" : "")"
+                     @onclick="() => State.DeleteRoutineAsync(rId)">
+                    <span class="text-white small fw-bold">루틴<br />삭제</span>
+                </div>
+
+                <div class="card border-0 bg-light-gray p-3 position-relative transition-transform cursor-pointer @(swipedRoutineId == rId ? "swiped" : "")"
+                     style="z-index: 10;"
+                     @onpointerdown="(e) => PointerDown(e)"
+                     @onpointerup="(e) => HandlePointerUp(e, rId)">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="fw-bold text-dark mb-1">@currentRoutine.Name</h6>
+                            <p class="text-secondary small m-0">@currentRoutine.TargetSummary</p>
+                        </div>
+                        <span class="badge bg-burn-soft-blue text-burn-blue px-2 py-1 rounded-2 fw-bold" style="font-size:12px;">
+                            ✓ @(currentRoutine.Exercises?.Count ?? 0)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .bg-light-gray {
+        background-color: #F6F8FA !important;
+    }
+
+    .bg-burn-soft-blue {
+        background-color: #EBF3FF !important;
+    }
+
+    .text-burn-blue {
+        color: #2F80ED !important;
+    }
+
+    .swipe-container {
+        min-height: 80px;
+    }
+
+    .swipe-delete-action {
+        width: 85px;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.15s;
+        border-radius: 16px 0 0 16px;
+    }
+
+        .swipe-delete-action.active {
+            opacity: 1;
+        }
+
+    .transition-transform {
+        transition: transform 0.25s cubic-bezier(0.1, 0.8, 0.1, 1);
+    }
+
+    .card.swiped {
+        transform: translateX(85px);
+    }
+</style>
+
+@code {
+    private string swipedRoutineId = "";
+    private double startX = 0;
+
+    private void PointerDown(PointerEventArgs e) => startX = e.ClientX;
+
+    private void HandlePointerUp(PointerEventArgs e, string id)
+    {
+        if (startX == 0) return;
+        var deltaX = e.ClientX - startX;
+        startX = 0;
+
+        if (deltaX > 50)
+        {
+            swipedRoutineId = id;
+        }
+        else if (deltaX < -30 && swipedRoutineId == id)
+        {
+            swipedRoutineId = "";
+        }
+        else if (Math.Abs(deltaX) <= 15)
+        {
+            if (swipedRoutineId == id)
+            {
+                swipedRoutineId = "";
+            }
+            else
+            {
+                // 🌟 객체를 직접 조작하지 않고, State 가드 엔진에 Id에 매핑되는 원본 루틴 추적을 위임
+                var target = State.Routines.FirstOrDefault(r => r.Id == id);
+                if (target != null) State.PreviewRoutine(target);
+            }
+        }
+    }
+}

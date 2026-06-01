@@ -1,0 +1,53 @@
+﻿@inject Services.WorkoutStateService State
+
+<div class="global-bottom-nav d-flex justify-content-around align-items-center bg-white border-top">
+    <div class="nav-tab @(State.CurrentView == "Dashboard" ? "active" : "")" @onclick='() => State.ChangeView("Dashboard")'>
+        <span class="icon">📅</span><span class="lbl">투데이</span>
+    </div>
+    <div class="nav-tab @(State.CurrentView == "RoutineSelect" ? "active" : "")" @onclick='() => State.ChangeView("RoutineSelect")'>
+        <span class="icon">📋</span><span class="lbl">내루틴</span>
+    </div>
+    <div class="nav-tab">
+        <span class="icon">📈</span><span class="lbl">분석</span>
+    </div>
+    <div class="nav-tab">
+        <span class="icon">👤</span><span class="lbl">프로필</span>
+    </div>
+</div>
+
+<style>
+    .global-bottom-nav {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 65px;
+        display: flex;
+        z-index: 100;
+    }
+
+    .nav-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #BDBDBD;
+        cursor: pointer;
+        transition: color 0.15s;
+    }
+
+        .nav-tab.active {
+            color: #2F80ED;
+            font-weight: bold;
+        }
+
+        .nav-tab .icon {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .nav-tab .lbl {
+            font-size: 10px;
+        }
+</style>

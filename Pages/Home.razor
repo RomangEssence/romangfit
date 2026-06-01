@@ -1,604 +1,98 @@
 ﻿@page "/"
-@inject IJSRuntime JS
+@inject Services.WorkoutStateService State
 @implements IDisposable
 
-<!-- 부트스트랩 미탑재 템플릿을 위한 CDN 강제 주입 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
 <div class="burnfit-app-shell shadow">
 
-    @if (currentView == "Dashboard")
+    @switch (State.CurrentView)
     {
-        <!-- ================= [화면 1: 투데이 대시보드] ================= -->
-        <div class="view-panel animated-fade">
-            <!-- 상단 인디케이터 배지 라인 -->
-            <div class="d-flex justify-content-between align-items-center p-3">
-                <div class="d-flex align-items-center gap-1">
-                    <span class="fs-5">🔥</span>
-                    <strong class="text-dark fs-5">1</strong>
-                </div>
-                <span class="badge bg-burn-blue text-white rounded-pill px-3 py-2 fw-bold shadow-sm" style="font-size: 11px; letter-spacing: 0.5px;">lol</span>
-                <div class="text-muted d-flex gap-3 fs-5 cursor-pointer">
-                    <span>📅</span><span>🔔</span>
-                </div>
-            </div>
+        case "Dashboard":
+            <DashboardView />
+            break;
 
-            <!-- 미니 주간 달력 스트립 -->
-            <div class="d-flex justify-content-around text-center px-2 py-3 bg-white rounded-4 mx-3 my-2 shadow-xs">
-                @for (int i = -3; i <= 3; i++)
-                {
-                    var day = DateTime.Today.AddDays(i);
-                    bool isToday = day == DateTime.Today;
-                    <div class="calendar-day-cell @(isToday ? "active" : "")">
-                        <span class="day-name">@day.ToString("ddd")</span>
-                        <span class="day-number">@day.Day</span>
-                        @if (i == -2 || i == 0)
-                        {
-                            <span class="dot-indicator">.</span>
-                        }
-                    </div>
-                }
-            </div>
+        case "RoutineSelect":
+            <RoutineSelectView />
+            break;
 
-            <!-- 중앙 메인 일지 CTA 카드 (계획된 운동이 없어요) -->
-            <div class="bg-white rounded-4 mx-3 my-4 p-5 text-center shadow-sm border border-light">
-                <div class="mb-3 text-secondary display-6" style="opacity: 0.4;">🏋️‍♂️</div>
-                <h5 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">계획된 운동이 없어요</h5>
-                <p class="text-muted small mb-4">지금 바로 운동을 계획해보세요!</p>
-                <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-6 shadow-sm mb-2" @onclick='() => currentView = "RoutineSelect"'>
-                    운동 기록하기
-                </button>
-                <button class="btn btn-link text-muted text-decoration-none btn-sm fw-bold">휴식 모드</button>
-            </div>
+        case "ExerciseSearch":
+            <ExerciseSearchView />
+            break;
 
-            <!-- 하단 식단 섹션 카드 -->
-            <div class="card mx-3 border-0 shadow-sm rounded-4 p-3 bg-white mb-5">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-dark fs-6">🍴 식단</span>
-                    <span class="text-muted small cursor-pointer">＞</span>
-                </div>
-                <h3 class="fw-black text-dark my-1">0 <span class="fs-6 text-muted fw-normal">kcal</span></h3>
-                <div class="progress rounded-pill bg-light my-3" style="height:6px;"><div class="progress-bar w-0"></div></div>
-                <div class="row text-center g-2 small text-muted">
-                    <div class="col-3"><div class="bg-gray-box p-2 rounded-3 border border-dashed">➕<br />아침</div></div>
-                    <div class="col-3"><div class="bg-gray-box p-2 rounded-3 border border-dashed">➕<br />점심</div></div>
-                    <div class="col-3"><div class="bg-gray-box p-2 rounded-3 border border-dashed">➕<br />저녁</div></div>
-                    <div class="col-3"><div class="bg-gray-box p-2 rounded-3 border border-dashed">➕<br />간식</div></div>
-                </div>
-            </div>
-        </div>
-    }
-    else if (currentView == "RoutineSelect")
-    {
-        <!-- ================= [화면 2: 내 루틴 탭 리스트] ================= -->
-        <div class="view-panel p-3 bg-white animated-fade">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="fs-4 cursor-pointer" @onclick='() => currentView = "Dashboard"'>‹</span>
-                <h5 class="fw-bold m-0 text-dark">5월 31일</h5>
-                <span class="fs-4 cursor-pointer" @onclick='() => currentView = "ExerciseSearch"'>＋</span>
-            </div>
+        case "RoutinePreview":
+            <RoutinePreviewSheet />
+            break;
 
-            <div class="d-flex text-center border-bottom tab-header mb-3">
-                <div class="flex-fill pb-2 text-muted cursor-pointer" @onclick='() => currentView = "ExerciseSearch"'>직접 추가</div>
-                <div class="flex-fill pb-2 text-burn-blue border-bottom border-burn-blue border-3 fw-bold cursor-pointer">내 루틴</div>
-                <div class="flex-fill pb-2 text-muted cursor-pointer">불러오기</div>
-            </div>
+        case "ActiveLogging":
+            <ActiveLoggingView />
+            break;
 
-            <div class="d-flex justify-content-between align-items-center text-muted mb-3" style="font-size: 13px;">
-                <span>전체 @MockRoutines.Count 개</span>
-                <span class="cursor-pointer">최근 저장순 ▾</span>
-            </div>
-
-            @foreach (var routine in MockRoutines)
-            {
-                <div class="card border-0 bg-light-gray rounded-4 p-3 mb-3 cursor-pointer hover-scale" @onclick="() => PreviewRoutine(routine)">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h6 class="fw-bold text-dark mb-1">@routine.Name</h6>
-                            <p class="text-secondary small m-0 mb-1">@routine.TargetSummary</p>
-                            <span class="text-black-50" style="font-size:11px;">2026년 5월 28일</span>
-                        </div>
-                        <span class="badge bg-burn-soft-blue text-burn-blue px-2 py-1 rounded-2 fw-bold" style="font-size:12px;">✓ 9</span>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else if (currentView == "ExerciseSearch")
-    {
-        <!-- ================= [화면 3: 직접 종목 추가 및 검색창] ================= -->
-        <div class="view-panel p-3 bg-white animated-fade">
-            <div class="d-flex align-items-center mb-3">
-                <span class="fs-4 cursor-pointer me-3" @onclick='() => currentView = "RoutineSelect"'>‹</span>
-                <h5 class="fw-bold m-0 flex-fill text-center">5월 31일</h5>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <input type="text" class="form-control rounded-3 border-0 bg-light-gray ps-3 py-2" placeholder="찾으시는 운동을 검색해보세요." />
-            </div>
-
-            <div class="d-flex gap-2 overflow-auto pb-2 mb-3" style="scrollbar-width: none;">
-                <span class="badge rounded-pill bg-burn-blue px-3 py-2 cursor-pointer">🔖</span>
-                <span class="badge rounded-pill bg-light-gray text-dark border px-3 py-2 cursor-pointer">전체</span>
-                <span class="badge rounded-pill bg-light-gray text-dark border px-3 py-2 cursor-pointer">하체</span>
-                <span class="badge rounded-pill bg-light-gray text-dark border px-3 py-2 cursor-pointer">가슴</span>
-                <span class="badge rounded-pill bg-light-gray text-dark border px-3 py-2 cursor-pointer">등</span>
-            </div>
-
-            <div class="list-group list-group-flush mt-2" style="max-height: 55vh; overflow-y: auto;">
-                @foreach (var ex in FlatExercisePool)
-                {
-                    <label class="list-group-item border-0 d-flex align-items-center gap-3 py-3 px-1 cursor-pointer">
-                        <input type="checkbox" class="form-check-input burn-checkbox" checked="@CheckedExercises.Contains(ex)" @onchange="(e) => OnExerciseChecked(ex, e.Value)" />
-                        <div class="avatar-circle">@ex.IconPlaceholder</div>
-                        <div class="flex-fill">
-                            <span class="small text-muted d-block" style="font-size:11px;">@ex.Category</span>
-                            <span class="fw-bold text-dark">@ex.Name</span>
-                        </div>
-                    </label>
-                }
-            </div>
-
-            @if (CheckedExercises.Any())
-            {
-                <div class="bottom-action-tray p-3 bg-white border-top shadow-lg">
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-light border rounded-3 px-3 fw-bold">＋</button>
-                        <button class="btn btn-burn-primary flex-fill py-3 rounded-3 fw-bold" @onclick="ConfirmAddExercises">
-                            @CheckedExercises.Count 개의 운동 추가하기
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else if (currentView == "RoutinePreview")
-    {
-        <!-- ================= [화면 4: 바텀 하프 모달 프리뷰 시트] ================= -->
-        <div class="view-panel p-3 bg-white animated-up container-sheet">
-            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                <h5 class="fw-bold m-0 text-dark">@selectedRoutine?.Name</h5>
-                <span class="text-muted small cursor-pointer">편집</span>
-            </div>
-
-            <div class="overflow-auto" style="max-height: 50vh;">
-                @foreach (var ex in selectedRoutine?.Exercises ?? new())
-                {
-                    <div class="d-flex align-items-center gap-3 py-3 border-bottom border-light">
-                        <div class="avatar-circle bg-light">@ex.IconPlaceholder</div>
-                        <div class="flex-fill">
-                            <h6 class="fw-bold text-dark m-0 mb-1"><span class="text-burn-blue me-2">@ex.SetNumber</span>@ex.Name</h6>
-                            <small class="text-muted">@ex.Category | @ex.Sets.Count 세트 | @(ex.IsCardio ? "10분" : "1440kg")</small>
-                        </div>
-                        <span class="text-muted">🗂️</span>
-                    </div>
-                }
-            </div>
-
-            <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-6 mt-4 shadow" @onclick="StartWorkoutFromRoutine">
-                운동 시작하기
-            </button>
-        </div>
-    }
-    else if (currentView == "ActiveLogging")
-    {
-        <!-- ================= [화면 5: 실전 일지 트래킹 화면] ================= -->
-        <div class="view-panel bg-light-gray p-3 pb-5">
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="fs-4 cursor-pointer" @onclick='() => currentView = "RoutineSelect"'>‹</span>
-                <h5 class="fw-bold m-0 text-dark">5월 31일</h5>
-                <div class="text-muted d-flex gap-3 fs-5"><span>📅</span><span>☰</span></div>
-            </div>
-
-            <div class="workout-scroll-zone" style="max-height: 62vh; overflow-y: auto; padding-bottom: 80px;">
-                @foreach (var ex in activeWorkout?.Exercises ?? new())
-                {
-                    <div class="card border-0 bg-white rounded-4 p-3 mb-3 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <h6 class="fw-bold text-dark m-0">
-                                <span class="text-burn-blue me-2">@ex.SetNumber</span>@ex.Category | @ex.Name
-                            </h6>
-                            <span class="text-muted small cursor-pointer">⋮</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="small text-danger fw-bold">총 볼륨 1440kg <span class="text-muted fw-normal">-480kg</span></span>
-                            <button class="btn btn-light btn-sm text-secondary border rounded-pill px-2 py-0" style="font-size:11px;">최근 기록</button>
-                        </div>
-
-                        <input type="text" class="form-control memo-field mb-3" placeholder="메모" />
-
-                        <div class="row g-2 text-center text-muted mb-2 small fw-bold border-bottom pb-2">
-                            <div class="col-2">세트</div>
-                            <div class="col-4">@(ex.IsCardio ? "시간" : "kg")</div>
-                            <div class="col-3">@(ex.IsCardio ? "-" : "회")</div>
-                            <div class="col-3">완료</div>
-                        </div>
-
-                        @foreach (var set in ex.Sets)
-                        {
-                            <div class="row g-2 align-items-center text-center mb-2">
-                                <div class="col-2"><span class="badge rounded-2 bg-light text-secondary w-100 py-2">@set.SetNumber</span></div>
-                                <div class="col-4">
-                                    @if (ex.IsCardio)
-                                    {
-                                        <input type="text" class="form-control form-control-sm text-center bg-light border-0 fw-bold" value="00:10:00" disabled />
-                                    }
-                                    else
-                                    {
-
-                                        <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Weight" />
-                                    }
-                                </div>
-                                <div class="col-3">
-                                    @if (!ex.IsCardio)
-                                    {
-                                        <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Reps" />
-                                    }
-                                    else
-                                    {
-
-                                        <span class="text-muted">-</span>
-                                    }
-                                </div>
-                                <div class="col-3">
-                                    <button class="btn btn-sm w-100 rounded-2 border-0 @(set.IsCompleted ? "btn-burn-active text-white" : "btn-burn-inactive text-muted")" @onclick="() => set.IsCompleted = !set.IsCompleted">
-                                        ✓
-                                    </button>
-                                </div>
-                            </div>
-                        }
-
-                        <div class="d-flex gap-4 mt-2 justify-content-center">
-                            <span class="text-secondary small cursor-pointer" @onclick="() => RemoveSet(ex)">— 세트삭제</span>
-                            <span class="text-burn-blue small cursor-pointer" @onclick="() => AddSet(ex)">＋ 세트추가</span>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <!-- 하단 트레이 고정 컨트롤 계통 -->
-            <div class="bottom-action-tray p-3 bg-white border-top shadow-lg">
-                <div class="d-flex gap-2 mb-2">
-                    <div class="bg-light rounded-3 p-2 text-center flex-fill border">
-                        <small class="text-muted d-block" style="font-size:9px; font-weight:bold;">휴식 타이머</small>
-                        <strong class="text-burn-blue" style="font-size:13px;">ON 01:30</strong>
-                    </div>
-                    <div class="bg-light rounded-3 p-2 text-center flex-fill border">
-                        <small class="text-muted d-block" style="font-size:9px; font-weight:bold;">운동 시간</small>
-                        <strong class="text-dark" style="font-size:13px;">@elapsedTime.ToString(@"hh\:mm\:ss")</strong>
-                    </div>
-                </div>
-                <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-5 shadow" @onclick="FinishWorkout">
-                    운동 완료
-                </button>
-            </div>
-        </div>
+        case "RoutineEdit":
+            <RoutineEditView />
+            break;
     }
 
-    <!-- ================= [하단 고정 글로벌 내비게이션 바] ================= -->
-    @if (currentView == "Dashboard" || currentView == "RoutineSelect")
+    @if (State.CurrentView == "Dashboard" || State.CurrentView == "RoutineSelect")
     {
-        <div class="global-bottom-nav d-flex justify-content-around align-items-center bg-white border-top">
-            <div class="nav-tab @(currentView == "Dashboard" ? "active" : "")" @onclick='() => currentView = "Dashboard"'>
-                <span class="icon">📅</span><span class="lbl">투데이</span>
-            </div>
-            <div class="nav-tab">
-                <span class="icon">💬</span><span class="lbl">커뮤니티</span>
-            </div>
-            <div class="nav-tab">
-                <span class="icon">📈</span><span class="lbl">분석</span>
-            </div>
-            <div class="nav-tab">
-                <span class="icon">👤</span><span class="lbl">프로필</span>
-            </div>
-        </div>
+        <GlobalBottomNav />
     }
 </div>
 
 <style>
-    /* 리얼 번핏 프리미엄 라이트 테마 UI 솔루션 엔진 스펙 */
     .burnfit-app-shell {
-        max-width: 430px;
-        margin: 0 auto;
-        min-height: 92vh;
+        width: 430px;
+        height: 860px;
+        margin: 2rem auto;
         background: linear-gradient(to bottom, #EBF3FF 0%, #F6F8FA 40%, #F6F8FA 100%);
         position: relative;
-        border-radius: 32px;
+        border-radius: 40px;
         overflow: hidden;
-        border: 4px solid #ffffff;
+        border: 8px solid #ffffff;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+        display: flex;
+        flex-direction: column;
     }
 
     .view-panel {
         width: 100%;
-        min-height: 92vh;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
         position: relative;
     }
 
-    .bg-burn-blue {
-        background-color: #2F80ED !important;
-    }
-
-    .text-burn-blue {
-        color: #2F80ED !important;
-    }
-
-    .bg-burn-soft-blue {
-        background-color: #EBF3FF !important;
-    }
-
-    .bg-light-gray {
-        background-color: #F6F8FA !important;
-    }
-
-    .bg-gray-box {
-        background-color: #FAFAFA;
-        font-size: 11px;
-    }
-
-    .btn-burn-primary {
-        background-color: #2F80ED;
-        color: white;
-        border: none;
-    }
-
-        .btn-burn-primary:hover {
-            background-color: #1a6fdc;
-            color: white;
-        }
-
-    /* 캘린더 커스텀 */
-    .calendar-day-cell {
-        padding: 6px;
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 40px;
-    }
-
-        .calendar-day-cell.active {
-            background-color: #2F80ED;
-            color: white !important;
-        }
-
-        .calendar-day-cell .day-name {
-            font-size: 10px;
-            color: #828282;
-        }
-
-        .calendar-day-cell.active .day-name {
-            color: #E0E0E0;
-        }
-
-        .calendar-day-cell .day-number {
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .calendar-day-cell .dot-indicator {
-            font-size: 12px;
-            line-height: 4px;
-            color: #2F80ED;
-        }
-
-        .calendar-day-cell.active .dot-indicator {
-            color: white;
-        }
-
-    /* 종목 목록 및 체크박스 */
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        background-color: #F2F4F7;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-
-    .burn-checkbox {
-        width: 20px;
-        height: 20px;
-        border-radius: 5px;
-        border: 2px solid #D0D5DD;
-        cursor: pointer;
-    }
-
-        .burn-checkbox:checked {
-            background-color: #2F80ED;
-            border-color: #2F80ED;
-        }
-
-    /* 일지 기록 세트 로우 */
-    .memo-field {
-        border: 0;
-        background-color: #F2F4F7;
-        font-size: 13px;
-        border-radius: 8px;
-    }
-
-    .btn-burn-inactive {
-        background-color: #F2F4F7;
-        color: #D0D5DD;
-    }
-
-    .btn-burn-active {
-        background-color: #2F80ED;
-        color: white;
-    }
-
-    /* 고정식 컴포넌트 하단 바킹 시스템 */
-    .bottom-action-tray {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 100;
-        box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
-    }
-
-    .global-bottom-nav {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 65px;
-        display: flex;
-        z-index: 100;
-    }
-
-    .nav-tab {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: #BDBDBD;
-        cursor: pointer;
-    }
-
-        .nav-tab.active {
-            color: #2F80ED;
-            font-weight: bold;
-        }
-
-        .nav-tab .icon {
-            font-size: 18px;
-            margin-bottom: 2px;
-        }
-
-        .nav-tab .lbl {
-            font-size: 10px;
-        }
-
-    /* 애니메이션 패키지 */
     .animated-fade {
-        animation: fIn 0.25s ease-out forwards;
-    }
-
-    .animated-up {
-        animation: sUp 0.3s cubic-bezier(0.1, 0.7, 0.1, 1) forwards;
+        animation: fIn 0.2s ease-out forwards;
     }
 
     @@keyframes fIn {
         from {
             opacity: 0;
+            transform: translateY(3px);
         }
 
         to {
             opacity: 1;
-        }
-    }
-
-    @@keyframes sUp {
-        from {
-            transform: translateY(100%);
-        }
-
-        to {
             transform: translateY(0);
         }
     }
 </style>
 
 @code {
-    private string currentView = "Dashboard"; // Dashboard, RoutineSelect, ExerciseSearch, RoutinePreview, ActiveLogging
-    private WorkoutRoutine? selectedRoutine;
-    private DailyWorkout? activeWorkout;
-    private List<Exercise> CheckedExercises = new();
-    private TimeSpan elapsedTime = TimeSpan.Zero;
-    private System.Threading.Timer? ticker;
-
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        ticker = new System.Threading.Timer((s) =>
-        {
-            if (currentView == "ActiveLogging")
-            {
-                elapsedTime = elapsedTime.Add(TimeSpan.FromSeconds(1));
-                InvokeAsync(StateHasChanged);
-            }
-        }, null, 0, 1000);
+        State.OnStateChanged += HandleStateChanged;
+        await State.InitializeAsync();
     }
 
-    private void PreviewRoutine(WorkoutRoutine routine)
+    private void HandleStateChanged()
     {
-        selectedRoutine = routine;
-        currentView = "RoutinePreview";
+        InvokeAsync(StateHasChanged);
     }
 
-    private void StartWorkoutFromRoutine()
+    public void Dispose()
     {
-        if (selectedRoutine == null) return;
-        activeWorkout = new DailyWorkout
-        {
-            Exercises = selectedRoutine.Exercises.Select((e, idx) => new Exercise
-            {
-                SetNumber = idx + 1,
-                Name = e.Name,
-                Category = e.Category,
-                IsCardio = e.IsCardio,
-                IconPlaceholder = e.IconPlaceholder,
-                Sets = e.Sets.Select(s => new SetLog { SetNumber = s.SetNumber, Weight = s.Weight, Reps = s.Reps }).ToList()
-            }).ToList()
-        };
-        elapsedTime = TimeSpan.Zero;
-        currentView = "ActiveLogging";
+        State.OnStateChanged -= HandleStateChanged;
     }
-
-    private void OnExerciseChecked(Exercise ex, object? val)
-    {
-        if (val is bool b && b) CheckedExercises.Add(ex);
-        else CheckedExercises.Remove(ex);
-    }
-
-    private void ConfirmAddExercises()
-    {
-        if (activeWorkout == null) activeWorkout = new DailyWorkout();
-        foreach (var ex in CheckedExercises)
-        {
-            activeWorkout.Exercises.Add(new Exercise
-            {
-                SetNumber = activeWorkout.Exercises.Count + 1,
-                Name = ex.Name,
-                Category = ex.Category,
-                IsCardio = ex.IsCardio,
-                IconPlaceholder = ex.IconPlaceholder,
-                Sets = new List<SetLog> { new() { SetNumber = 1 } }
-            });
-        }
-        CheckedExercises.Clear();
-        currentView = "ActiveLogging";
-    }
-
-    private void AddSet(Exercise ex) => ex.Sets.Add(new SetLog { SetNumber = ex.Sets.Count + 1 });
-    private void RemoveSet(Exercise ex) { if (ex.Sets.Count > 1) ex.Sets.RemoveAt(ex.Sets.Count - 1); }
-    private void FinishWorkout() => currentView = "Dashboard";
-    public void Dispose() => ticker?.Dispose();
-
-    // 엔티티 구조 스펙 정의
-    public class SetLog { public int SetNumber { get; set; } public double Weight { get; set; } = 40; public int Reps { get; set; } = 12; public bool IsCompleted { get; set; } }
-    public class Exercise { public int SetNumber { get; set; } public string Name { get; set; } = ""; public string Category { get; set; } = ""; public string IconPlaceholder { get; set; } = "💪"; public bool IsCardio { get; set; } public List<SetLog> Sets { get; set; } = new(); }
-    public class WorkoutRoutine { public string Name { get; set; } = ""; public string TargetSummary { get; set; } = ""; public List<Exercise> Exercises { get; set; } = new(); }
-    public class DailyWorkout { public List<Exercise> Exercises { get; set; } = new(); }
-
-    private List<Exercise> FlatExercisePool => new() {
-        new() { Name = "케이블 푸시 다운", Category = "팔", IconPlaceholder = "💪" },
-        new() { Name = "리어 델토이드 플라이 머신", Category = "어깨", IconPlaceholder = "🦅" },
-        new() { Name = "레터럴 와이드 풀다운", Category = "등", IconPlaceholder = "👐" },
-        new() { Name = "싸이클", Category = "유산소", IconPlaceholder = "🚴", IsCardio = true }
-    };
-
-    private List<WorkoutRoutine> MockRoutines => new() {
-        new() { Name = "하체", TargetSummary = "유산소 · 하체", Exercises = new() {
-            new() { Name = "싸이클", Category = "유산소", IsCardio = true, IconPlaceholder = "🚴", Sets = new() { new() } },
-            new() { Name = "시티드 레그 컬", Category = "하체", IconPlaceholder = "🦵", Sets = new() { new(){SetNumber=1}, new(){SetNumber=2}, new(){SetNumber=3} } },
-            new() { Name = "힙 어덕션 머신", Category = "하체", IconPlaceholder = "🍑", Sets = new() { new(){SetNumber=1}, new(){SetNumber=2}, new(){SetNumber=3} } },
-            new() { Name = "수평 레그 프레스", Category = "하체", IconPlaceholder = "🏋️", Sets = new() { new(){SetNumber=1}, new(){SetNumber=2}, new(){SetNumber=3}, new(){SetNumber=4} } }
-        }},
-        new() { Name = "등 이두", TargetSummary = "유산소 · 등 · 어깨 · 팔" },
-        new() { Name = "가슴 어깨 삼두", TargetSummary = "유산소 · 가슴 · 어깨 · 팔" }
-    };
 }

@@ -1,0 +1,221 @@
+﻿@using romangfit.Models
+@inject Services.WorkoutStateService State
+
+<div class="view-panel bg-light-gray p-3 d-flex flex-column" style="height: 100%;">
+    @if (State.EditingRoutine == null)
+    {
+        <div class="text-center py-5 m-auto">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="text-muted small mt-2">루틴 데이터를 구성하는 중...</p>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
+            <span class="fs-4 cursor-pointer text-dark" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+            <input type="text" class="form-control mx-3 fw-bold text-center border-0 bg-white rounded-3 shadow-xs"
+                   style="font-size:15px; color:#333; height: 38px;" @bind="State.EditingRoutine.Name" placeholder="루틴 이름" />
+            <span class="small fw-bold text-primary cursor-pointer text-nowrap" style="flex-shrink: 0; min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
+        </div>
+
+        <div class="flex-fill" style="overflow-y: auto; padding-bottom: 150px; scrollbar-width: none; -ms-overflow-style: none;">
+            @if (State.EditingRoutine.Exercises == null || !State.EditingRoutine.Exercises.Any())
+            {
+                <div class="text-center py-5 my-4 bg-white rounded-4 border border-dashed">
+                    <p class="text-muted small m-0">아래 버튼을 눌러<br />루틴에 포함할 운동을 설계하세요.</p>
+                </div>
+            }
+            else
+            {
+                @for (int i = 0; i < State.EditingRoutine.Exercises.Count; i++)
+                {
+                    var index = i;
+                    var ex = State.EditingRoutine.Exercises[index];
+                    if (ex == null) continue;
+                    var currentExId = ex.Id;
+
+                    <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4 bg-light"
+                         draggable="true"
+                         @ondragstart="() => HandleDragStart(index)"
+                         @ondragover:preventDefault
+                         @ondragdrop="() => HandleDrop(index)">
+
+                        <div class="swipe-delete-action bg-danger d-flex align-items-center px-3 position-absolute start-0 top-0 h-100 cursor-pointer @(swipedExerciseId == currentExId ? "active" : "")"
+                             @onclick="() => State.RemoveExerciseFromEditing(currentExId)">
+                            <span class="text-white fw-bold" style="font-size:11px;">종목<br />삭제</span>
+                        </div>
+
+                        <div class="card border-0 bg-white p-3 position-relative transition-transform @(swipedExerciseId == currentExId ? "swiped" : "")"
+                             style="z-index: 10;"
+                             @onpointerdown="(e) => PointerDown(e)"
+                             @onpointerup="(e) => HandlePointerUp(e, currentExId)">
+
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                <span class="fw-bold text-dark" style="font-size:14px; cursor: grab;">
+                                    <span class="drag-handle me-2">☰</span>
+                                    <span class="text-burn-blue me-1">@ex.SetNumber</span> @ex.Name
+                                </span>
+                                <span class="text-muted" style="font-size:11px;">@ex.Category</span>
+                            </div>
+
+                            @if (ex.Sets != null)
+                            {
+                                @for (int sIdx = 0; sIdx < ex.Sets.Count; sIdx++)
+                                {
+                                    var set = ex.Sets[sIdx];
+                                    <div class="row g-2 text-center align-items-center mb-1" style="font-size: 13px;">
+                                        <div class="col-2 text-muted fw-bold">@set.SetNumber</div>
+                                        <div class="col-5 d-flex align-items-center gap-1">
+                                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Weight" />
+                                            <span class="text-muted small">kg</span>
+                                        </div>
+                                        <div class="col-5 d-flex align-items-center gap-1">
+                                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Reps" />
+                                            <span class="text-muted small">회</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+                            <div class="d-flex gap-4 mt-2 justify-content-center border-top pt-2" style="font-size: 11px;">
+                                <span class="text-secondary cursor-pointer" @onclick="() => RemoveSet(index)">— 세트삭제</span>
+                                <span class="text-burn-blue cursor-pointer" @onclick="() => AddSet(index)">＋ 세트추가</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="bottom-action-tray p-3 bg-white border-top">
+            <div class="row g-2 mb-2">
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary w-100 py-2.5 rounded-3 fw-bold small"
+                            @onclick='() => State.ChangeView("ExerciseSearch")'>
+                        운동 추가
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-bold small">
+                        불러오기
+                    </button>
+                </div>
+            </div>
+            <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-6 shadow-sm" @onclick="State.SaveEditingRoutineAsync">
+                루틴으로 저장하기
+            </button>
+        </div>
+    }
+</div>
+
+<style>
+    .bg-light-gray {
+        background-color: #F6F8FA !important;
+    }
+
+    .text-burn-blue {
+        color: #2F80ED !important;
+    }
+
+    .btn-burn-primary {
+        background-color: #2F80ED;
+        color: white;
+        border: none;
+    }
+
+    .drag-handle {
+        color: #ccc;
+        cursor: grab;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .bottom-action-tray {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+    }
+
+    .swipe-container {
+        min-height: 120px;
+    }
+
+    .swipe-delete-action {
+        width: 75px;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 0.15s;
+        border-radius: 16px 0 0 16px;
+        text-align: center;
+    }
+
+        .swipe-delete-action.active {
+            opacity: 1;
+        }
+
+    .card.swiped {
+        transform: translateX(75px);
+    }
+
+    .transition-transform {
+        transition: transform 0.2s ease-out;
+    }
+</style>
+
+@code {
+    private string swipedExerciseId = "";
+    private double startX = 0;
+    private int draggingIndex = -1;
+
+    private void PointerDown(PointerEventArgs e) => startX = e.ClientX;
+
+    private void HandlePointerUp(PointerEventArgs e, string id)
+    {
+        if (startX == 0) return;
+        var deltaX = e.ClientX - startX;
+        startX = 0;
+
+        if (deltaX > 50) swipedExerciseId = id;
+        else if (deltaX < -30 && swipedExerciseId == id) swipedExerciseId = "";
+        else if (Math.Abs(deltaX) <= 15 && swipedExerciseId == id) swipedExerciseId = "";
+    }
+
+    private void HandleDragStart(int index) => draggingIndex = index;
+    private void HandleDrop(int dropTargetIndex)
+    {
+        if (draggingIndex != -1)
+        {
+            State.ReorderExercise(draggingIndex, dropTargetIndex);
+            draggingIndex = -1;
+        }
+    }
+
+    private void AddSet(int exIndex)
+    {
+        var ex = State.EditingRoutine?.Exercises[exIndex];
+        if (ex != null)
+        {
+            ex.Sets.Add(new SetLog
+            {
+                SetNumber = ex.Sets.Count + 1,
+                Weight = ex.Sets.LastOrDefault()?.Weight ?? 40,
+                Reps = ex.Sets.LastOrDefault()?.Reps ?? 12
+            });
+            State.NotifyStateChanged();
+        }
+    }
+
+    private void RemoveSet(int exIndex)
+    {
+        var ex = State.EditingRoutine?.Exercises[exIndex];
+        if (ex != null && ex.Sets.Count > 1)
+        {
+            ex.Sets.RemoveAt(ex.Sets.Count - 1);
+            State.NotifyStateChanged();
+        }
+    }
+}

@@ -1,0 +1,108 @@
+﻿@inject Services.WorkoutStateService State
+
+<div class="view-panel p-3 bg-white animated-fade flex-fill d-flex flex-column" style="height: 100%;">
+    <div class="d-flex align-items-center mb-3">
+        <span class="fs-4 cursor-pointer me-3 text-dark fw-bold"
+              @onclick='() => State.ChangeView(State.EditingRoutine != null ? "RoutineEdit" : "RoutineSelect")'>‹</span>
+        <h5 class="fw-bold m-0 flex-fill text-center text-dark">운동 선택</h5>
+    </div>
+
+    <div class="mb-3 position-relative">
+        <input type="text" class="form-control rounded-3 border-0 bg-light ps-3 py-2" style="background-color:#F2F4F7 !important;" placeholder="찾으시는 운동을 검색해보세요." />
+    </div>
+
+    <div class="d-flex gap-2 overflow-auto pb-2 mb-3 no-scrollbar" style="white-space: nowrap;">
+        <span class="badge rounded-pill bg-burn-blue px-3 py-2 cursor-pointer">🔖</span>
+        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">전체</span>
+        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">하체</span>
+        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">가슴</span>
+        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">등</span>
+    </div>
+
+    <div class="list-group list-group-flush mt-2 flex-fill" style="overflow-y: auto; padding-bottom:90px; scrollbar-width:none;">
+        @foreach (var ex in FlatExercisePool)
+        {
+            var currentEx = ex; // 클로저 안전 스코프 락
+            <label class="list-group-item border-0 d-flex align-items-center gap-3 py-3 px-1 cursor-pointer rounded-3 hover-bg">
+                <input type="checkbox" class="form-check-input burn-checkbox"
+                       checked="@State.CheckedExercises.Any(e => e.Name == currentEx.Name)"
+                       @onchange="() => State.ToggleExerciseCheck(currentEx)" />
+                <div class="avatar-circle">@currentEx.IconPlaceholder</div>
+                <div class="flex-fill">
+                    <span class="small text-muted d-block" style="font-size:11px;">@currentEx.Category</span>
+                    <span class="fw-bold text-dark">@currentEx.Name</span>
+                </div>
+            </label>
+        }
+    </div>
+
+    @if (State.CheckedExercises.Any())
+    {
+        <div class="bottom-action-tray p-3 bg-white border-top shadow-lg" style="position: absolute; bottom: 0; left: 0; width: 100%; z-index: 100;">
+            <div class="d-flex gap-2">
+                <button class="btn btn-light border rounded-3 px-3 fw-bold text-secondary">＋</button>
+                <button class="btn btn-burn-primary flex-fill py-3 rounded-3 fw-bold" @onclick="State.ConfirmAddExercises">
+                    @State.CheckedExercises.Count 개의 운동 추가하기
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .bg-burn-blue {
+        background-color: #2F80ED !important;
+    }
+
+    .btn-burn-primary {
+        background-color: #2F80ED;
+        color: white;
+        border: none;
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        background-color: #F2F4F7;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .burn-checkbox {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: 2px solid #D0D5DD;
+        cursor: pointer;
+    }
+
+        .burn-checkbox:checked {
+            background-color: #2F80ED;
+            border-color: #2F80ED;
+        }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hover-bg:hover {
+        background-color: #F6F8FA;
+    }
+</style>
+
+@code {
+    private List<Models.Exercise> FlatExercisePool => new() {
+        new() { Name = "스쿼트", Category = "하체", IconPlaceholder = "🏋️" },
+        new() { Name = "데드리프트", Category = "등", IconPlaceholder = "🏋️" },
+        new() { Name = "벤치프레스", Category = "가슴", IconPlaceholder = "🏋️" },
+        new() { Name = "시티드 Leg Curl", Category = "하체", IconPlaceholder = "🦵" },
+        new() { Name = "수평 레그 프레스", Category = "하체", IconPlaceholder = "🏋️" },
+        new() { Name = "케이블 푸시 다운", Category = "팔", IconPlaceholder = "💪" },
+        new() { Name = "리어 델토이드 플라이 머신", Category = "어깨", IconPlaceholder = "🦅" },
+        new() { Name = "레터럴 와이드 풀다운", Category = "등", IconPlaceholder = "👐" },
+        new() { Name = "싸이클", Category = "유산소", IconPlaceholder = "🚴", IsCardio = true }
+    };
+}

@@ -1,0 +1,133 @@
+﻿@inject Services.WorkoutStateService State
+
+<div class="view-panel p-3 bg-white animated-up container-sheet flex-fill d-flex flex-column" style="height: 100%;">
+    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3" style="height: 40px;">
+        <h5 class="fw-bold m-0 text-dark">@State.SelectedRoutine?.Name</h5>
+        <div class="d-flex gap-3 small">
+            <span class="text-primary cursor-pointer fw-bold" @onclick="State.EditSelectedRoutine">편집</span>
+            <span class="text-muted cursor-pointer" @onclick='() => State.ChangeView("RoutineSelect")'>닫기</span>
+        </div>
+    </div>
+
+    <div class="flex-fill" style="overflow-y: auto; padding-bottom: 90px; scrollbar-width: none;">
+        @if (State.SelectedRoutine != null)
+        {
+            @foreach (var ex in State.SelectedRoutine.Exercises)
+            {
+                var currentExerciseId = ex.Id;
+                bool isTargetExpanded = expandedExerciseId == currentExerciseId;
+
+                <div class="border-bottom border-light py-2">
+                    <div class="d-flex align-items-center gap-3 py-2 cursor-pointer unselectable"
+                         @onclick="() => ToggleRow(currentExerciseId)">
+                        <div class="fs-3">@ex.IconPlaceholder</div>
+                        <div class="flex-fill">
+                            <h6 class="fw-bold text-dark m-0 mb-1">
+                                <span class="text-burn-blue me-2">@ex.SetNumber</span>@ex.Name
+                            </h6>
+                            <small class="text-muted">
+                                @ex.Category | @ex.Sets.Count 세트 @(ex.IsCardio ? "" : "| 1440kg")
+                            </small>
+                        </div>
+                        <span class="text-muted arrow-flip @(isTargetExpanded ? "flipped" : "")">▼</span>
+                    </div>
+
+                    @if (isTargetExpanded)
+                    {
+                        <div class="bg-light-gray rounded-3 p-2 mt-1 mx-2 animated-fade">
+                            @foreach (var set in ex.Sets)
+                            {
+                                <div class="d-flex justify-content-between px-3 py-1 small text-secondary border-bottom border-white">
+                                    <span class="fw-bold">@set.SetNumber 세트</span>
+                                    <span>
+                                        @if (ex.IsCardio)
+                                        {
+                                            <span>10분</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span>@set.Weight kg × @set.Reps 회</span>
+                                        }
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    <div class="bottom-action-tray p-3 bg-white">
+        <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-5 shadow"
+                @onclick="State.StartWorkoutFromRoutineAsync">
+            운동 시작하기
+        </button>
+    </div>
+</div>
+
+<style>
+    .container-sheet {
+        border-radius: 32px 32px 0 0;
+    }
+
+    .bg-light-gray {
+        background-color: #F6F8FA;
+    }
+
+    .text-burn-blue {
+        color: #2F80ED;
+    }
+
+    .btn-burn-primary {
+        background-color: #2F80ED;
+        color: white;
+        border: none;
+    }
+
+    .unselectable {
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .arrow-flip {
+        display: inline-block;
+        font-size: 11px;
+        transition: transform 0.2s;
+    }
+
+        .arrow-flip.flipped {
+            transform: rotate(-180deg);
+        }
+
+    .bottom-action-tray {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 10;
+    }
+
+    .animated-up {
+        animation: sUp 0.25s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+    }
+    @@keyframes sUp {
+        from {
+            transform: translateY(100%);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@code {
+    private string expandedExerciseId = "";
+
+    private void ToggleRow(string id)
+    {
+        expandedExerciseId = expandedExerciseId == id ? "" : id;
+    }
+}

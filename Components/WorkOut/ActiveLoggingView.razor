@@ -1,0 +1,100 @@
+﻿@inject Services.WorkoutStateService State
+@implements IDisposable
+
+<div class="view-panel bg-light-gray p-3">
+    <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
+        <span class="fs-4 cursor-pointer" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+        <h5 class="fw-bold m-0 text-dark">@DateTime.Today.ToString("M월 d일")</h5>
+        <div class="text-muted d-flex gap-3 fs-5"><span>📅</span><span>☰</span></div>
+    </div>
+
+    <div class="workout-scroll-zone flex-fill" style="overflow-y: auto; padding-bottom: 140px; scrollbar-width: none; -ms-overflow-style: none;">
+        @if (State.ActiveWorkout != null && State.ActiveWorkout.Exercises.Any())
+        {
+            @foreach (var ex in State.ActiveWorkout.Exercises)
+            {
+                <ExerciseLoggingCard ContextExercise="ex" />
+            }
+        }
+        else
+        {
+            <div class="text-center py-5 my-5 animated-fade">
+                <div class="fs-1 mb-2" style="opacity: 0.3;">📋</div>
+                <h6 class="fw-bold text-secondary">수행할 운동이 없습니다.</h6>
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-3 mt-2 fw-bold"
+                        @onclick='() => State.ChangeView("ExerciseSearch")'>
+                    ＋ 운동 추가하기
+                </button>
+            </div>
+        }
+    </div>
+
+    <div class="bottom-action-tray p-3 bg-white border-top">
+        <div class="d-flex gap-2 mb-2">
+            <button class="btn flex-fill py-2 rounded-3 text-center border @(State.IsTimerOn ? "btn-soft-blue text-primary border-primary" : "bg-light")"
+                    @onclick="State.ToggleTimer">
+                <small class="text-muted d-block" style="font-size:9px; font-weight:bold;">휴식 타이머</small>
+                <strong style="font-size:13px;">@(State.IsTimerOn ? "ON 01:30" : "OFF")</strong>
+            </button>
+            <div class="bg-light rounded-3 p-2 text-center flex-fill border">
+                <small class="text-muted d-block" style="font-size:9px; font-weight:bold;">운동 시간</small>
+                <strong class="text-dark" style="font-size:13px;">@State.ElapsedTime.ToString(@"hh\:mm\:ss")</strong>
+            </div>
+        </div>
+        <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-5 shadow"
+                @onclick="State.CompleteWorkoutAsync">
+            운동 완료
+        </button>
+    </div>
+</div>
+
+<style>
+    .bg-light-gray {
+        background-color: #F6F8FA !important;
+    }
+
+    .btn-soft-blue {
+        background-color: #EBF3FF !important;
+    }
+
+    .btn-burn-primary {
+        background-color: #2F80ED;
+        color: white;
+        border: none;
+    }
+
+    .bottom-action-tray {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .workout-scroll-zone::-webkit-scrollbar {
+        display: none;
+    }
+</style>
+
+@code {
+    // 🌟 자식 컴포넌트가 직접 전역 상태 엔진을 실시간 구독하여 파라미터 억까 우회
+    protected override void OnInitialized()
+    {
+        State.OnStateChanged += HandleStateChanged;
+    }
+
+    private void HandleStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        State.OnStateChanged -= HandleStateChanged;
+    }
+}
