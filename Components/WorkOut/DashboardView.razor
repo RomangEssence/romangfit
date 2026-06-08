@@ -1,61 +1,73 @@
-﻿@inject Services.WorkoutStateService State
+@inject Services.WorkoutStateService State
 
-<div class="view-panel animated-fade d-flex flex-column justify-content-between" style="height: 100%;">
-    <div class="flex-fill" style="overflow-y: auto; padding-bottom: 80px; scrollbar-width: none;">
-        <div class="d-flex justify-content-between align-items-center p-3">
-            <div class="d-flex align-items-center gap-1">
-                <span>🔥</span>
-                <strong class="text-dark fs-5">@State.WorkoutHistory.Count</strong> @* 🌟 실제 누적 운동 일수가 스트릭이 됩니다 *@
+<div class="view-panel animated-fade d-flex flex-column justify-content-between h-100 dark-bg">
+    <div class="flex-fill scroll-zone px-3">
+        <!-- 상단 헤더 / 요약 정보 -->
+        <div class="d-flex justify-content-between align-items-center py-3">
+            <div class="streak-badge px-3 py-2 rounded-pill d-flex align-items-center gap-1.5 border-neon-glow">
+                <span class="fs-6">🔥</span>
+                <span class="fw-bold text-white small">스트릭 <strong class="text-neon fs-5">@State.WorkoutHistory.Count</strong>일</span>
             </div>
-            <span class="badge bg-burn-blue text-white rounded-pill px-3 py-2 fw-bold shadow-sm" style="font-size: 11px;">B. PRO</span>
-            <div class="text-muted d-flex gap-3 fs-5"><span>📅</span><span>🔔</span></div>
+            <span class="badge bg-neon-dark text-neon rounded-pill px-3 py-2 fw-bold" style="font-size: 11px;">R. FIT</span>
+            <div class="text-muted-gray d-flex gap-3 fs-5">
+                <span class="cursor-pointer">📅</span>
+                <span class="cursor-pointer">🔔</span>
+            </div>
         </div>
 
-        <div class="d-flex justify-content-around text-center px-2 py-3 bg-white rounded-4 mx-3 my-2 shadow-xs">
+        <!-- 주간 캘린더 (미니멀 다크 모드) -->
+        <div class="premium-card d-flex justify-content-around text-center py-3 border-0">
             @for (int i = -3; i <= 3; i++)
             {
                 var day = DateTime.Today.AddDays(i);
                 bool isToday = day == DateTime.Today;
-                // 💡 내 운동 기록 중 해당 날짜에 완료한 운동이 있는지 검사해서 하단 점 인디케이터 활성화
                 bool hasWorkout = State.WorkoutHistory.Any(h => h.Date.Date == day.Date);
 
-                <div class="calendar-day-cell @(isToday ? "active" : "")">
+                <div class="calendar-day-cell @(isToday ? "active" : "") @(hasWorkout ? "has-workout" : "")">
                     <span class="day-name">@day.ToString("ddd")</span>
-                    <span class="day-number">@day.Day</span>
+                    <span class="day-number text-white">@day.Day</span>
                     @if (hasWorkout)
                     {
-                        <span class="dot-indicator">.</span>
+                        <span class="dot-indicator"></span>
                     }
                 </div>
             }
         </div>
 
-        <div class="bg-white rounded-4 mx-3 my-4 p-4 text-center shadow-sm border border-light">
-            <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-6 shadow-sm"
+        <!-- 메인 기록하기 버튼 -->
+        <div class="premium-card p-3 text-center border-0">
+            <button class="btn btn-neon-primary w-100 py-3 rounded-3 fw-bold fs-6"
                     @onclick='() => State.ChangeView("RoutineSelect")'>
-                새 운동 기록하기
+                새 운동 시작하기
             </button>
         </div>
 
-        <div class="px-3">
-            <h6 class="fw-bold text-dark mb-3" style="font-size: 14px;">최근 운동 일지</h6>
+        <!-- 최근 운동 일지 -->
+        <div class="mt-4">
+            <h6 class="fw-bold text-white mb-3" style="font-size: 14px; letter-spacing: -0.3px;">최근 운동 일지</h6>
             @if (!State.WorkoutHistory.Any())
             {
-                <p class="text-muted small text-center py-4 bg-white rounded-4 border border-dashed">아직 저장된 운동 기록이 없습니다.</p>
+                <div class="premium-card text-center py-5 border-dashed">
+                    <div class="fs-1 mb-2 opacity-50">🏋️</div>
+                    <p class="text-muted-gray small m-0">아직 저장된 운동 기록이 없습니다.<br />오늘의 운동을 시작해 보세요!</p>
+                </div>
             }
             else
             {
                 @foreach (var log in State.WorkoutHistory.AsEnumerable().Reverse())
                 {
-                    <div class="card border-0 bg-white rounded-4 p-3 mb-2 shadow-xs">
+                    <div class="premium-card border-0">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <strong class="text-dark" style="font-size:14px;">🏋️ @log.RoutineName</strong>
-                            <span class="text-muted" style="font-size:11px;">@log.Date.ToString("yyyy-MM-dd")</span>
+                            <strong class="text-white" style="font-size:14px;">🏋️ @log.RoutineName</strong>
+                            <span class="text-muted-gray" style="font-size:11px;">@log.Date.ToString("yyyy-MM-dd")</span>
                         </div>
-                        <div style="font-size:12px; color:#666;">
+                        <div class="log-exercise-list mt-2">
                             @foreach (var ex in log.Exercises)
                             {
-                                <div class="mb-1">• @ex.Name <span class="text-burn-blue fw-bold">@ex.Sets.Count 세트</span> 완료</div>
+                                <div class="log-exercise-item d-flex justify-content-between align-items-center text-light-gray" style="font-size:12px;">
+                                    <span>• @ex.Name</span>
+                                    <span class="text-neon fw-bold" style="font-size:11px;">@ex.Sets.Count 세트 완료</span>
+                                </div>
                             }
                         </div>
                     </div>
@@ -66,64 +78,114 @@
 </div>
 
 <style>
-    .bg-burn-blue {
-        background-color: #2F80ED !important;
+    .dark-bg {
+        background-color: var(--bg-dark) !important;
     }
 
-    .text-burn-blue {
-        color: #2F80ED !important;
+    .text-muted-gray {
+        color: var(--text-muted) !important;
     }
 
-    .btn-burn-primary {
-        background-color: #2F80ED;
-        color: white;
-        border: none;
+    .text-light-gray {
+        color: var(--text-light-gray) !important;
+    }
+
+    .text-neon {
+        color: var(--neon-green) !important;
+    }
+
+    .border-neon-glow {
+        border: 1px solid var(--neon-green-glow);
+        background: var(--bg-card);
+        box-shadow: 0 4px 12px var(--neon-green-glow);
+    }
+
+    .bg-neon-dark {
+        background-color: var(--neon-green-glow) !important;
+        border: 1px solid rgba(0, 102, 255, 0.2);
     }
 
     .calendar-day-cell {
-        padding: 6px;
-        border-radius: 12px;
+        padding: 8px 6px;
+        border-radius: 14px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 40px;
+        width: 42px;
+        position: relative;
+        transition: all 0.2s ease;
     }
 
-        .calendar-day-cell.active {
-            background-color: #2F80ED;
-            color: white !important;
-        }
+    .calendar-day-cell.active {
+        background-color: var(--neon-green);
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 12px var(--neon-green-glow);
+    }
 
-        .calendar-day-cell .day-name {
-            font-size: 10px;
-            color: #828282;
-        }
+    .calendar-day-cell.active .day-name {
+        color: #FFFFFF !important;
+        font-weight: 700;
+    }
 
-        .calendar-day-cell.active .day-name {
-            color: #E0E0E0;
-        }
+    .calendar-day-cell.active .day-number {
+        color: #FFFFFF !important;
+        font-weight: 800;
+    }
 
-        .calendar-day-cell .day-number {
-            font-size: 14px;
-            font-weight: bold;
-        }
+    .calendar-day-cell .day-name {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+        text-transform: uppercase;
+    }
 
-        .calendar-day-cell .dot-indicator {
-            font-size: 14px;
-            line-height: 2px;
-            color: #2F80ED;
-            font-weight: bold;
-        }
+    .calendar-day-cell .day-number {
+        font-size: 14px;
+        font-weight: 600;
+    }
 
-        .calendar-day-cell.active .dot-indicator {
-            color: white;
-        }
+    .calendar-day-cell .dot-indicator {
+        position: absolute;
+        bottom: 4px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: var(--neon-green);
+    }
+
+    .calendar-day-cell.active .dot-indicator {
+        background-color: #FFFFFF;
+    }
+
+    .calendar-day-cell.has-workout:not(.active) {
+        border: 1px solid var(--neon-green-glow);
+        background-color: var(--neon-green-glow);
+    }
 
     .border-dashed {
-        border-style: dashed !important;
+        border: 1px dashed var(--border-light) !important;
+        background: transparent !important;
     }
 
-    .shadow-xs {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    .log-exercise-list {
+        background: var(--bg-card-solid);
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
     }
-</style>
+
+    .log-exercise-item {
+        padding: 4px 0;
+    }
+    .log-exercise-item:not(:last-child) {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .cursor-pointer:hover {
+        opacity: 0.7;
+    }
+</style>

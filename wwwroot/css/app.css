@@ -1,89 +1,231 @@
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+/* ==========================================
+   RomangFit - Premium Dark Neon Theme Styles
+   ========================================== */
+
+:root {
+    --bg-darker: #EDF2F7;
+    --bg-dark: #FFFFFF;
+    --bg-card: rgba(248, 250, 252, 0.85);
+    --bg-card-solid: #F1F5F9;
+    --border-light: rgba(15, 23, 42, 0.08);
+    --text-primary: #0F172A;
+    --text-muted: #64748B;
+    --neon-green: #0066FF;
+    --neon-green-glow: rgba(0, 102, 255, 0.12);
+    --neon-blue: #0EA5E9;
+    --neon-blue-glow: rgba(14, 165, 233, 0.15);
+    --danger-red: #EF4444;
 }
 
-.invalid {
-    outline: 1px solid red;
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-darker);
+    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.validation-message {
-    color: red;
+/* 폰 쉘 시뮬레이터 프레임 */
+.burnfit-app-shell {
+    width: 420px;
+    height: 860px;
+    background: var(--bg-dark);
+    position: relative;
+    border-radius: 48px;
+    overflow: hidden;
+    border: 12px solid #0F172A; /* Sleek slate phone ring */
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15),
+                0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+    display: flex;
+    flex-direction: column;
 }
 
-#blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
+/* Global text-white overrides inside the light-theme app shell */
+.burnfit-app-shell .text-white {
+    color: var(--text-primary) !important;
+}
+
+/* Ensure text on rich action buttons, delete zones, and active tabs stays readable (white) */
+.burnfit-app-shell .btn-neon-primary,
+.burnfit-app-shell .btn-neon-active,
+.burnfit-app-shell .btn-neon,
+.burnfit-app-shell .bg-neon,
+.burnfit-app-shell .bg-danger,
+.burnfit-app-shell .bg-danger .text-white,
+.burnfit-app-shell .swipe-delete-action,
+.burnfit-app-shell .swipe-delete-action .text-white,
+.burnfit-app-shell .btn-danger,
+.burnfit-app-shell .btn-outline-danger:hover {
+    color: #FFFFFF !important;
+}
+
+/* 스마트폰 노치 (다이내믹 아일랜드 느낌) */
+.phone-notch-bar {
+    height: 38px;
+    background-color: var(--bg-dark);
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 28px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-primary);
     z-index: 1000;
+    user-select: none;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
-
-.blazor-error-boundary {
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
-    padding: 1rem 1rem 1rem 3.7rem;
-    color: white;
+.phone-notch-bar::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 24px;
+    background-color: #000000;
+    border-radius: 12px;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+/* 뷰 패널 공통 스타일 */
+.view-panel {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: var(--bg-dark);
+}
 
+/* 스크롤 영역 공통 */
+.scroll-zone {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 90px;
+}
+
+.scroll-zone::-webkit-scrollbar {
+    display: none;
+}
+
+/* 글래스모피즘 프리미엄 카드 */
+.premium-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.premium-card:hover {
+    border-color: rgba(0, 255, 157, 0.2);
+}
+
+/* 버튼 테마 */
+.btn-neon-primary {
+    background-color: var(--neon-green) !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 4px 14px var(--neon-green-glow);
+    transition: all 0.25s ease;
+}
+
+.btn-neon-primary:hover {
+    background-color: #0052cc !important;
+    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4) !important;
+    transform: translateY(-1px);
+}
+
+.btn-neon-outline {
+    background: transparent;
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-neon-outline:hover {
+    background: rgba(0, 255, 157, 0.1);
+    color: var(--neon-green);
+}
+
+/* 미크로 애니메이션 효과 */
+.animated-fade {
+    animation: fIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: sUp 0.3s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+}
+
+@keyframes sUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* Blazor 기본 에러 UI 숨기기 */
+#blazor-error-ui {
+    display: none !important;
+}
+
+/* 로딩 화면 커스텀 */
 .loading-progress {
     position: absolute;
-    display: block;
-    width: 8rem;
-    height: 8rem;
-    inset: 20vh 0 auto 0;
-    margin: 0 auto 0 auto;
+    width: 60px;
+    height: 60px;
+    inset: 35vh 0 auto 0;
+    margin: 0 auto;
 }
 
-    .loading-progress circle {
-        fill: none;
-        stroke: #e0e0e0;
-        stroke-width: 0.6rem;
-        transform-origin: 50% 50%;
-        transform: rotate(-90deg);
-    }
+.loading-progress circle {
+    fill: none;
+    stroke: rgba(15, 23, 42, 0.05);
+    stroke-width: 4px;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
 
-        .loading-progress circle:last-child {
-            stroke: #1b6ec2;
-            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-            transition: stroke-dasharray 0.05s ease-in-out;
-        }
+.loading-progress circle:last-child {
+    stroke: var(--neon-green);
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.6), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
 
 .loading-progress-text {
     position: absolute;
     text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: 13px;
+    inset: calc(35vh + 70px) 0 auto 0;
 }
 
-    .loading-progress-text:after {
-        content: var(--blazor-load-percentage-text, "Loading");
-    }
-
-code {
-    color: #c02d76;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "로딩 중...");
 }

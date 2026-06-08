@@ -1,4 +1,4 @@
-﻿namespace romangfit.Models;
+namespace romangfit.Models;
 
 public class SetLog
 {
@@ -25,6 +25,7 @@ public class WorkoutRoutine
 {
     // 🌟 루틴마다 고유한 주민번호를 무조건 부여하여 스와이프 간섭을 원천 차단합니다.
     public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string UserId { get; set; } = string.Empty; // Firebase 사용자 ID
     public required string Name { get; set; }
     public string TargetSummary { get; set; } = "전신";
     public List<Exercise> Exercises { get; set; } = new();

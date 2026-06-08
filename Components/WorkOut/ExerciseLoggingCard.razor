@@ -1,126 +1,184 @@
-﻿@using romangfit.Models
+@using romangfit.Models
 @inject Services.WorkoutStateService State
 
-<div class="card workout-card mb-3 border-0 shadow-sm rounded-4 bg-white overflow-hidden">
-
-    <div class="p-3 cursor-pointer d-flex justify-content-between align-items-center unselectable" @onclick="ToggleExpand">
-        <h6 class="fw-bold text-dark m-0">
-            <span class="text-burn-blue me-2">@ContextExercise.SetNumber</span>
-            @ContextExercise.Category | @ContextExercise.Name
+<div class="premium-card mb-3 border-0 overflow-hidden">
+    <!-- 카드 헤더 (클릭 시 접고 펴기) -->
+    <div class="p-2 cursor-pointer d-flex justify-content-between align-items-center unselectable" @onclick="ToggleExpand">
+        <h6 class="fw-bold text-white m-0">
+            <span class="text-neon me-2">@ContextExercise.SetNumber</span>
+            <span class="small text-muted-gray me-2">@ContextExercise.Category</span>|
+            <span class="ms-2">@ContextExercise.Name</span>
         </h6>
 
         <div class="d-flex align-items-center gap-3">
             @if (!isExpanded)
             {
-                <span class="text-secondary fw-bold" style="font-size: 13px; letter-spacing: -0.3px;">
+                <span class="text-neon fw-bold" style="font-size: 13px; letter-spacing: -0.3px;">
                     @CompletedSetsCount / @ContextExercise.Sets.Count SET
                     @if (!ContextExercise.IsCardio)
                     {
-                        <span class="ms-1 text-muted fw-normal">(@(TotalVolume)kg)</span>
+                        <span class="ms-1 text-muted-gray fw-normal">(@(TotalVolume)kg)</span>
                     }
                 </span>
             }
-            <span class="text-muted arrow-icon @(isExpanded ? "rotated" : "")">▼</span>
+            <span class="text-muted-gray arrow-icon @(isExpanded ? "rotated" : "")">▼</span>
         </div>
     </div>
 
     @if (isExpanded)
     {
-        <div class="card-body pt-0 px-3 pb-3 animated-slide-down">
+        <!-- 펼쳐진 카드 바디 -->
+        <div class="pt-2 pb-1 animated-slide-down">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 @if (ContextExercise.IsCardio)
                 {
-                    <span class="small text-muted fw-bold">총 시간 @TotalCardioTime 분</span>
+                    <span class="small text-muted-gray fw-bold">총 시간 <span class="text-neon">@TotalCardioTime</span> 분</span>
                 }
                 else
                 {
-                    <span class="small text-danger fw-bold">
-                        총 볼륨 @TotalVolume kg
-                        <span class="text-muted fw-normal" style="font-size: 11px;">(완료 세트 기준)</span>
+                    <span class="small text-muted-gray fw-bold">
+                        총 볼륨 <span class="text-neon">@TotalVolume</span> kg
+                        <span class="text-muted-gray fw-normal" style="font-size: 10px;">(완료 세트 기준)</span>
                     </span>
                 }
-                <button class="btn btn-light btn-sm text-secondary border rounded-pill px-2 py-0" style="font-size:11px;">최근 기록</button>
+                <span class="text-neon badge bg-dark border-light-glow" style="font-size:10px;">실시간 기록</span>
             </div>
 
-            <input type="text" class="form-control memo-field mb-3" placeholder="메모 입력" @bind="ContextExercise.Memo" />
+            <!-- 메모 입력 필드 -->
+            <input type="text" class="form-control dark-memo-field mb-3" placeholder="운동 팁 또는 메모 입력" @bind="ContextExercise.Memo" />
 
-            <div class="row g-2 text-center text-muted mb-2 small fw-bold border-bottom pb-2">
+            <!-- 헤더 칼럼 -->
+            <div class="row g-2 text-center text-muted-gray mb-2 small fw-bold border-bottom-dark pb-2">
                 <div class="col-2">세트</div>
                 <div class="col-4">@(ContextExercise.IsCardio ? "시간" : "kg")</div>
                 <div class="col-3">@(ContextExercise.IsCardio ? "-" : "회")</div>
                 <div class="col-3">완료</div>
             </div>
 
+            <!-- 각 세트별 로그 -->
             @foreach (var set in ContextExercise.Sets)
             {
+                var currentSet = set; // 클로저 안전 스코프 락
                 <div class="row g-2 align-items-center text-center mb-2">
                     <div class="col-2">
-                        <span class="badge rounded-2 bg-light text-secondary w-100 py-2">@set.SetNumber</span>
+                        <span class="badge rounded-2 bg-darker text-light-gray w-100 py-2 border-light-glow">@currentSet.SetNumber</span>
                     </div>
                     <div class="col-4">
                         @if (ContextExercise.IsCardio)
                         {
-                            <input type="text" class="form-control form-control-sm text-center bg-light border-0 fw-bold" value="00:10:00" disabled />
+                            <input type="text" class="form-control form-control-sm text-center dark-set-input disabled" value="00:10:00" disabled />
                         }
                         else
                         {
-                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Weight" />
+                            <input type="number" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Weight" />
                         }
                     </div>
                     <div class="col-3">
                         @if (!ContextExercise.IsCardio)
                         {
-                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Reps" />
+                            <input type="number" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Reps" />
                         }
                         else
                         {
-                            <span class="text-muted">-</span>
+                            <span class="text-muted-gray">-</span>
                         }
                     </div>
                     <div class="col-3">
-                        <button class="btn btn-sm w-100 rounded-2 border-0 @(set.IsCompleted ? "btn-burn-active text-white" : "btn-burn-inactive text-muted")"
-                                @onclick="() => ToggleSetCompletion(set)">
+                        <button class="btn btn-sm w-100 rounded-2 border-0 btn-set-check @(currentSet.IsCompleted ? "btn-neon-active" : "btn-dark-inactive")"
+                                @onclick="() => ToggleSetCompletion(currentSet)">
                             ✓
                         </button>
                     </div>
                 </div>
             }
 
+            <!-- 세트 추가/삭제 조작부 -->
             <div class="d-flex gap-4 mt-3 justify-content-center">
-                <span class="text-secondary small cursor-pointer hover-link" @onclick="RemoveLastSet">— 세트삭제</span>
-                <span class="text-burn-blue small cursor-pointer hover-link" @onclick="AddNewSet">＋ 세트추가</span>
+                <span class="text-danger small cursor-pointer hover-opacity" @onclick="RemoveLastSet">— 세트삭제</span>
+                <span class="text-neon small cursor-pointer hover-opacity" @onclick="AddNewSet">＋ 세트추가</span>
             </div>
         </div>
     }
 </div>
 
 <style>
-    .text-burn-blue {
-        color: #2F80ED !important;
+    .text-muted-gray {
+        color: var(--text-muted) !important;
     }
 
-    .memo-field {
-        border: 0;
-        background-color: #F2F4F7;
+    .text-light-gray {
+        color: var(--text-light-gray) !important;
+    }
+
+    .text-neon {
+        color: var(--neon-green) !important;
+    }
+
+    .border-bottom-dark {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .dark-memo-field {
+        border: 1px solid var(--border-light);
+        background-color: var(--bg-card-solid);
         font-size: 13px;
         border-radius: 8px;
+        color: var(--text-primary);
+    }
+    .dark-memo-field:focus {
+        background-color: var(--bg-card-solid);
+        border-color: var(--neon-green);
+        color: var(--text-primary);
+        box-shadow: none;
     }
 
-    .btn-burn-inactive {
-        background-color: #F2F4F7;
-        color: #D0D5DD;
+    .dark-set-input {
+        background-color: var(--bg-card-solid);
+        border: 1px solid var(--border-light);
+        color: var(--text-primary);
+    }
+    .dark-set-input:focus {
+        border-color: var(--neon-green);
+        background-color: var(--bg-card-solid);
+        color: var(--text-primary);
+        box-shadow: none;
     }
 
-    .btn-burn-active {
-        background-color: #2F80ED;
-        color: white;
+    .bg-darker {
+        background-color: var(--bg-card-solid) !important;
+    }
+
+    .border-light-glow {
+        border: 1px solid var(--border-light) !important;
+    }
+    
+    .badge.border-light-glow {
+        background-color: var(--bg-card-solid) !important;
+        color: var(--neon-green) !important;
+    }
+
+    .btn-set-check {
+        font-weight: 800;
+        transition: all 0.2s ease;
+    }
+
+    .btn-dark-inactive {
+        background-color: var(--bg-card-solid);
+        color: var(--text-muted);
+        border: 1px solid var(--border-light) !important;
+    }
+
+    .btn-neon-active {
+        background-color: var(--neon-green);
+        color: #FFFFFF;
+        box-shadow: 0 0 10px var(--neon-green-glow);
     }
 
     .cursor-pointer {
         cursor: pointer;
     }
 
-    .hover-link:hover {
+    .hover-opacity:hover {
         opacity: 0.7;
     }
 
@@ -129,18 +187,17 @@
         -webkit-user-select: none;
     }
 
-    /* 부드러운 화살표 회전 애니메이션 */
     .arrow-icon {
         display: inline-block;
         transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 10px;
     }
 
-        .arrow-icon.rotated {
-            transform: rotate(-180deg);
-        }
+    .arrow-icon.rotated {
+        transform: rotate(-180deg);
+        color: var(--neon-green);
+    }
 
-    /* 열릴 때 부드럽게 내려오는 페이드 스무스 효과 */
     .animated-slide-down {
         animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         transform-origin: top;
@@ -151,7 +208,6 @@
             opacity: 0;
             transform: scaleY(0.95);
         }
-
         to {
             opacity: 1;
             transform: scaleY(1);
@@ -162,7 +218,6 @@
 @code {
     [Parameter] public required Exercise ContextExercise { get; set; }
 
-    // 🌟 컴포넌트 내부 개별 확장/축소 상태 머신 변수 (기본값: 펼침)
     private bool isExpanded = true;
 
     private double TotalVolume => ContextExercise.Sets.Where(s => s.IsCompleted).Sum(s => s.Weight * s.Reps);
@@ -177,6 +232,11 @@
     private void ToggleSetCompletion(SetLog set)
     {
         set.IsCompleted = !set.IsCompleted;
+        if (set.IsCompleted)
+        {
+            // 세트 성공 완료 시 자동으로 전역 쉬는시간 타이머 작동!
+            State.StartRestTimer(State.DefaultRestDuration);
+        }
         State.NotifyStateChanged();
     }
 

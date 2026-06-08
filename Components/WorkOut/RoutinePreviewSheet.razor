@@ -1,15 +1,19 @@
-﻿@inject Services.WorkoutStateService State
+@inject Services.WorkoutStateService State
+@inject IJSRuntime JS
 
-<div class="view-panel p-3 bg-white animated-up container-sheet flex-fill d-flex flex-column" style="height: 100%;">
-    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3" style="height: 40px;">
-        <h5 class="fw-bold m-0 text-dark">@State.SelectedRoutine?.Name</h5>
-        <div class="d-flex gap-3 small">
-            <span class="text-primary cursor-pointer fw-bold" @onclick="State.EditSelectedRoutine">편집</span>
-            <span class="text-muted cursor-pointer" @onclick='() => State.ChangeView("RoutineSelect")'>닫기</span>
+<div class="view-panel p-3 dark-theme-bg animated-up container-sheet flex-fill d-flex flex-column h-100 border-top-glow">
+    <!-- 상단 헤더 -->
+    <div class="d-flex justify-content-between align-items-center border-bottom-dark pb-3 mb-3" style="height: 40px;">
+        <h5 class="fw-bold m-0 text-white">@State.SelectedRoutine?.Name</h5>
+        <div class="d-flex gap-3 small align-items-center">
+            <span class="text-danger cursor-pointer fw-bold hover-underline" @onclick="DeleteRoutine">삭제</span>
+            <span class="text-neon cursor-pointer fw-bold hover-underline" @onclick="State.EditSelectedRoutine">편집</span>
+            <span class="text-muted-gray cursor-pointer hover-opacity" @onclick='() => State.ChangeView("RoutineSelect")'>닫기</span>
         </div>
     </div>
 
-    <div class="flex-fill" style="overflow-y: auto; padding-bottom: 90px; scrollbar-width: none;">
+    <!-- 운동 목록 목록 -->
+    <div class="flex-fill scroll-container pb-5">
         @if (State.SelectedRoutine != null)
         {
             @foreach (var ex in State.SelectedRoutine.Exercises)
@@ -17,37 +21,38 @@
                 var currentExerciseId = ex.Id;
                 bool isTargetExpanded = expandedExerciseId == currentExerciseId;
 
-                <div class="border-bottom border-light py-2">
+                <div class="border-bottom-dark py-2">
+                    <!-- 운동 정보 요약 행 -->
                     <div class="d-flex align-items-center gap-3 py-2 cursor-pointer unselectable"
-                         @onclick="() => ToggleRow(currentExerciseId)">
-                        <div class="fs-3">@ex.IconPlaceholder</div>
+                          @onclick="() => ToggleRow(currentExerciseId)">
+                        <div class="avatar-circle-sm">@ex.IconPlaceholder</div>
                         <div class="flex-fill">
-                            <h6 class="fw-bold text-dark m-0 mb-1">
-                                <span class="text-burn-blue me-2">@ex.SetNumber</span>@ex.Name
+                            <h6 class="fw-bold text-white m-0 mb-1">
+                                <span class="text-neon me-2">@ex.SetNumber</span>@ex.Name
                             </h6>
-                            <small class="text-muted">
-                                @ex.Category | @ex.Sets.Count 세트 @(ex.IsCardio ? "" : "| 1440kg")
+                            <small class="text-muted-gray">
+                                @ex.Category | @ex.Sets.Count 세트 @(ex.IsCardio ? "" : $"| {ex.Sets.Sum(s => s.Weight * s.Reps)}kg")
                             </small>
                         </div>
-                        <span class="text-muted arrow-flip @(isTargetExpanded ? "flipped" : "")">▼</span>
+                        <span class="text-muted-gray arrow-flip @(isTargetExpanded ? "flipped" : "")">▼</span>
                     </div>
 
+                    <!-- 세트 정보 리스트 (확장 시) -->
                     @if (isTargetExpanded)
                     {
-                        <div class="bg-light-gray rounded-3 p-2 mt-1 mx-2 animated-fade">
+                        <div class="bg-darker-card rounded-4 p-2.5 mt-2 mx-1 animated-fade border-light-glow">
                             @foreach (var set in ex.Sets)
                             {
-                                <div class="d-flex justify-content-between px-3 py-1 small text-secondary border-bottom border-white">
-                                    <span class="fw-bold">@set.SetNumber 세트</span>
+                                <div class="d-flex justify-content-between px-3 py-1.5 small text-light-gray border-bottom-white-subtle">
+                                    <span class="fw-bold text-muted-gray">@set.SetNumber 세트</span>
                                     <span>
                                         @if (ex.IsCardio)
                                         {
-                                            <span>10분</span>
+                                            <span>@set.Duration.TotalMinutes 분</span>
                                         }
                                         else
                                         {
-
-                                            <span>@set.Weight kg × @set.Reps 회</span>
+                                            <span class="text-white fw-semibold">@set.Weight kg</span> <span class="text-muted-gray">×</span> <span class="text-neon fw-bold">@set.Reps 회</span>
                                         }
                                     </span>
                                 </div>
@@ -59,8 +64,9 @@
         }
     </div>
 
-    <div class="bottom-action-tray p-3 bg-white">
-        <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-5 shadow"
+    <!-- 하단 시작 버튼 트레이 -->
+    <div class="bottom-action-tray p-3 dark-glass border-top-dark">
+        <button class="btn btn-neon-primary w-100 py-3 rounded-3 fw-bold fs-5"
                 @onclick="State.StartWorkoutFromRoutineAsync">
             운동 시작하기
         </button>
@@ -70,20 +76,58 @@
 <style>
     .container-sheet {
         border-radius: 32px 32px 0 0;
+        background-color: var(--bg-dark) !important;
     }
 
-    .bg-light-gray {
-        background-color: #F6F8FA;
+    .border-top-glow {
+        border-top: 1.5px solid var(--neon-green);
     }
 
-    .text-burn-blue {
-        color: #2F80ED;
+    .dark-theme-bg {
+        background-color: var(--bg-dark) !important;
     }
 
-    .btn-burn-primary {
-        background-color: #2F80ED;
-        color: white;
-        border: none;
+    .border-bottom-dark {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .text-light-gray {
+        color: var(--text-light-gray) !important;
+    }
+
+    .text-muted-gray {
+        color: var(--text-muted) !important;
+    }
+
+    .text-neon {
+        color: var(--neon-green) !important;
+    }
+
+    .avatar-circle-sm {
+        width: 36px;
+        height: 36px;
+        background-color: var(--bg-card-solid);
+        color: var(--text-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    .bg-darker-card {
+        background-color: var(--bg-card-solid);
+    }
+
+    .border-light-glow {
+        border: 1px solid var(--border-light);
+    }
+
+    .border-bottom-white-subtle {
+        border-bottom: 1px solid var(--border-light);
+    }
+    .border-bottom-white-subtle:last-child {
+        border-bottom: none;
     }
 
     .unselectable {
@@ -93,13 +137,14 @@
 
     .arrow-flip {
         display: inline-block;
-        font-size: 11px;
+        font-size: 10px;
         transition: transform 0.2s;
     }
 
-        .arrow-flip.flipped {
-            transform: rotate(-180deg);
-        }
+    .arrow-flip.flipped {
+        transform: rotate(-180deg);
+        color: var(--neon-green);
+    }
 
     .bottom-action-tray {
         position: absolute;
@@ -109,17 +154,30 @@
         z-index: 10;
     }
 
+    .dark-glass {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border-light);
+    }
+
     .animated-up {
         animation: sUp 0.25s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
     }
-    @@keyframes sUp {
-        from {
-            transform: translateY(100%);
-        }
 
-        to {
-            transform: translateY(0);
-        }
+    .scroll-container {
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+    .scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hover-underline:hover {
+        text-decoration: underline;
+    }
+    
+    .hover-opacity:hover {
+        opacity: 0.7;
     }
 </style>
 
@@ -129,5 +187,17 @@
     private void ToggleRow(string id)
     {
         expandedExerciseId = expandedExerciseId == id ? "" : id;
+    }
+
+    private async Task DeleteRoutine()
+    {
+        if (State.SelectedRoutine != null)
+        {
+            bool confirmed = await JS.InvokeAsync<bool>("confirm", $"'{State.SelectedRoutine.Name}' 루틴을 정말 삭제하시겠습니까?");
+            if (confirmed)
+            {
+                await State.DeleteRoutineAsync(State.SelectedRoutine.Id);
+            }
+        }
     }
 }

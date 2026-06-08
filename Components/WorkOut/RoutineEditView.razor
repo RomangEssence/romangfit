@@ -1,28 +1,30 @@
-﻿@using romangfit.Models
+@using romangfit.Models
 @inject Services.WorkoutStateService State
 
-<div class="view-panel bg-light-gray p-3 d-flex flex-column" style="height: 100%;">
+<div class="view-panel dark-theme-bg p-3 d-flex flex-column h-100">
     @if (State.EditingRoutine == null)
     {
         <div class="text-center py-5 m-auto">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="text-muted small mt-2">루틴 데이터를 구성하는 중...</p>
+            <div class="spinner-border text-neon" role="status"></div>
+            <p class="text-muted-gray small mt-2">루틴 데이터를 구성하는 중...</p>
         </div>
     }
     else
     {
+        <!-- 상단 헤더 -->
         <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
-            <span class="fs-4 cursor-pointer text-dark" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
-            <input type="text" class="form-control mx-3 fw-bold text-center border-0 bg-white rounded-3 shadow-xs"
-                   style="font-size:15px; color:#333; height: 38px;" @bind="State.EditingRoutine.Name" placeholder="루틴 이름" />
-            <span class="small fw-bold text-primary cursor-pointer text-nowrap" style="flex-shrink: 0; min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
+            <span class="fs-4 cursor-pointer text-light-gray" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+            <input type="text" class="form-control mx-3 fw-bold text-center dark-input rounded-3"
+                   style="font-size:15px; height: 38px;" @bind="State.EditingRoutine.Name" placeholder="루틴 이름" />
+            <span class="small fw-bold text-neon cursor-pointer text-nowrap" style="flex-shrink: 0; min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
         </div>
 
-        <div class="flex-fill" style="overflow-y: auto; padding-bottom: 150px; scrollbar-width: none; -ms-overflow-style: none;">
+        <!-- 운동 목록 편집 리스트 -->
+        <div class="flex-fill scroll-container pb-5">
             @if (State.EditingRoutine.Exercises == null || !State.EditingRoutine.Exercises.Any())
             {
-                <div class="text-center py-5 my-4 bg-white rounded-4 border border-dashed">
-                    <p class="text-muted small m-0">아래 버튼을 눌러<br />루틴에 포함할 운동을 설계하세요.</p>
+                <div class="text-center py-5 my-4 bg-darker rounded-4 border-dashed">
+                    <p class="text-muted-gray small m-0">아래 버튼을 눌러<br />루틴에 포함할 운동을 추가하세요.</p>
                 </div>
             }
             else
@@ -34,52 +36,55 @@
                     if (ex == null) continue;
                     var currentExId = ex.Id;
 
-                    <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4 bg-light"
-                         draggable="true"
-                         @ondragstart="() => HandleDragStart(index)"
-                         @ondragover:preventDefault
-                         @ondragdrop="() => HandleDrop(index)">
+                    <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4"
+                          draggable="true"
+                          @ondragstart="() => HandleDragStart(index)"
+                          @ondragover:preventDefault
+                          @ondragdrop="() => HandleDrop(index)">
 
+                        <!-- 스와이프 삭제 액션 -->
                         <div class="swipe-delete-action bg-danger d-flex align-items-center px-3 position-absolute start-0 top-0 h-100 cursor-pointer @(swipedExerciseId == currentExId ? "active" : "")"
                              @onclick="() => State.RemoveExerciseFromEditing(currentExId)">
                             <span class="text-white fw-bold" style="font-size:11px;">종목<br />삭제</span>
                         </div>
 
-                        <div class="card border-0 bg-white p-3 position-relative transition-transform @(swipedExerciseId == currentExId ? "swiped" : "")"
+                        <!-- 개별 운동 설계 카드 -->
+                        <div class="card premium-card border-0 m-0 position-relative transition-transform @(swipedExerciseId == currentExId ? "swiped" : "")"
                              style="z-index: 10;"
                              @onpointerdown="(e) => PointerDown(e)"
                              @onpointerup="(e) => HandlePointerUp(e, currentExId)">
 
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                <span class="fw-bold text-dark" style="font-size:14px; cursor: grab;">
+                            <div class="d-flex justify-content-between align-items-center border-bottom-dark pb-2 mb-2">
+                                <span class="fw-bold text-white font-size-14" style="cursor: grab;">
                                     <span class="drag-handle me-2">☰</span>
-                                    <span class="text-burn-blue me-1">@ex.SetNumber</span> @ex.Name
+                                    <span class="text-neon me-1">@ex.SetNumber</span> @ex.Name
                                 </span>
-                                <span class="text-muted" style="font-size:11px;">@ex.Category</span>
+                                <span class="text-muted-gray" style="font-size:11px;">@ex.Category</span>
                             </div>
 
                             @if (ex.Sets != null)
                             {
                                 @for (int sIdx = 0; sIdx < ex.Sets.Count; sIdx++)
                                 {
-                                    var set = ex.Sets[sIdx];
-                                    <div class="row g-2 text-center align-items-center mb-1" style="font-size: 13px;">
-                                        <div class="col-2 text-muted fw-bold">@set.SetNumber</div>
-                                        <div class="col-5 d-flex align-items-center gap-1">
-                                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Weight" />
-                                            <span class="text-muted small">kg</span>
+                                    var currentSet = ex.Sets[sIdx];
+                                    <div class="row g-2 text-center align-items-center mb-1.5" style="font-size: 13px;">
+                                        <div class="col-2 text-muted-gray fw-bold">@currentSet.SetNumber</div>
+                                        <div class="col-5 d-flex align-items-center gap-1.5">
+                                            <input type="number" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Weight" />
+                                            <span class="text-muted-gray small">kg</span>
                                         </div>
-                                        <div class="col-5 d-flex align-items-center gap-1">
-                                            <input type="number" class="form-control form-control-sm text-center bg-light border-0 fw-bold" @bind="set.Reps" />
-                                            <span class="text-muted small">회</span>
+                                        <div class="col-5 d-flex align-items-center gap-1.5">
+                                            <input type="number" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Reps" />
+                                            <span class="text-muted-gray small">회</span>
                                         </div>
                                     </div>
                                 }
                             }
 
-                            <div class="d-flex gap-4 mt-2 justify-content-center border-top pt-2" style="font-size: 11px;">
-                                <span class="text-secondary cursor-pointer" @onclick="() => RemoveSet(index)">— 세트삭제</span>
-                                <span class="text-burn-blue cursor-pointer" @onclick="() => AddSet(index)">＋ 세트추가</span>
+                            <!-- 세트 관리 조작계 -->
+                            <div class="d-flex gap-4 mt-2.5 justify-content-center border-top-dark pt-2.5" style="font-size: 11px;">
+                                <span class="text-danger cursor-pointer hover-opacity" @onclick="() => RemoveSet(index)">— 세트삭제</span>
+                                <span class="text-neon cursor-pointer hover-opacity" @onclick="() => AddSet(index)">＋ 세트추가</span>
                             </div>
                         </div>
                     </div>
@@ -87,21 +92,22 @@
             }
         </div>
 
-        <div class="bottom-action-tray p-3 bg-white border-top">
-            <div class="row g-2 mb-2">
+        <!-- 하단 액션 트레이 -->
+        <div class="bottom-action-tray p-3 dark-glass border-top-dark">
+            <div class="row g-2 mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-outline-primary w-100 py-2.5 rounded-3 fw-bold small"
+                    <button type="button" class="btn btn-neon-outline w-100 py-2.5 rounded-3 fw-bold small"
                             @onclick='() => State.ChangeView("ExerciseSearch")'>
                         운동 추가
                     </button>
                 </div>
                 <div class="col-6">
-                    <button class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-bold small">
+                    <button class="btn btn-outline-secondary w-100 py-2.5 rounded-3 fw-bold small text-muted-gray border-secondary-dark cursor-not-allowed">
                         불러오기
                     </button>
                 </div>
             </div>
-            <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-6 shadow-sm" @onclick="State.SaveEditingRoutineAsync">
+            <button class="btn btn-neon-primary w-100 py-3 rounded-3 fw-bold fs-6" @onclick="State.SaveEditingRoutineAsync">
                 루틴으로 저장하기
             </button>
         </div>
@@ -109,27 +115,61 @@
 </div>
 
 <style>
-    .bg-light-gray {
-        background-color: #F6F8FA !important;
+    .dark-theme-bg {
+        background-color: var(--bg-dark) !important;
     }
 
-    .text-burn-blue {
-        color: #2F80ED !important;
+    .text-light-gray {
+        color: var(--text-light-gray) !important;
     }
 
-    .btn-burn-primary {
-        background-color: #2F80ED;
-        color: white;
-        border: none;
+    .text-muted-gray {
+        color: var(--text-muted) !important;
     }
 
-    .drag-handle {
-        color: #ccc;
-        cursor: grab;
+    .text-neon {
+        color: var(--neon-green) !important;
+    }
+
+    .border-bottom-dark {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .border-top-dark {
+        border-top: 1px solid var(--border-light);
+    }
+
+    .bg-darker {
+        background-color: var(--bg-card-solid) !important;
     }
 
     .border-dashed {
-        border-style: dashed !important;
+        border: 1px dashed var(--border-light) !important;
+    }
+
+    .dark-input {
+        background-color: var(--bg-card-solid) !important;
+        border: 1px solid var(--border-light) !important;
+        color: var(--text-primary) !important;
+    }
+    .dark-input:focus {
+        border-color: var(--neon-green) !important;
+        box-shadow: none !important;
+    }
+
+    .dark-set-input {
+        background-color: var(--bg-dark);
+        border: 1px solid var(--border-light);
+        color: var(--text-primary);
+    }
+    .dark-set-input:focus {
+        border-color: var(--neon-green);
+        box-shadow: none;
+    }
+
+    .drag-handle {
+        color: #5A6573;
+        cursor: grab;
     }
 
     .bottom-action-tray {
@@ -140,8 +180,15 @@
         z-index: 100;
     }
 
+    .dark-glass {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border-light);
+    }
+
     .swipe-container {
         min-height: 120px;
+        background-color: rgba(255, 77, 77, 0.05);
     }
 
     .swipe-delete-action {
@@ -153,16 +200,41 @@
         text-align: center;
     }
 
-        .swipe-delete-action.active {
-            opacity: 1;
-        }
+    .swipe-delete-action.active {
+        opacity: 1;
+    }
 
-    .card.swiped {
+    .premium-card.swiped {
         transform: translateX(75px);
     }
 
-    .transition-transform {
-        transition: transform 0.2s ease-out;
+    .font-size-14 {
+        font-size: 14px;
+    }
+
+    .scroll-container {
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+    .scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .border-secondary-dark {
+        border-color: var(--border-light) !important;
+    }
+
+    .cursor-not-allowed {
+        cursor: not-allowed;
+        opacity: 0.4;
+    }
+
+    .hover-opacity:hover {
+        opacity: 0.7;
+    }
+
+    .spinner-border.text-neon {
+        color: var(--neon-green) !important;
     }
 </style>
 

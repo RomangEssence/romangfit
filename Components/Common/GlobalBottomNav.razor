@@ -1,29 +1,38 @@
-﻿@inject Services.WorkoutStateService State
+@inject Services.WorkoutStateService State
 
-<div class="global-bottom-nav d-flex justify-content-around align-items-center bg-white border-top">
+<div class="global-bottom-nav d-flex justify-content-around align-items-center dark-glass-nav">
     <div class="nav-tab @(State.CurrentView == "Dashboard" ? "active" : "")" @onclick='() => State.ChangeView("Dashboard")'>
-        <span class="icon">📅</span><span class="lbl">투데이</span>
+        <span class="icon">📅</span>
+        <span class="lbl">투데이</span>
     </div>
     <div class="nav-tab @(State.CurrentView == "RoutineSelect" ? "active" : "")" @onclick='() => State.ChangeView("RoutineSelect")'>
-        <span class="icon">📋</span><span class="lbl">내루틴</span>
+        <span class="icon">📋</span>
+        <span class="lbl">내루틴</span>
     </div>
-    <div class="nav-tab">
-        <span class="icon">📈</span><span class="lbl">분석</span>
+    <div class="nav-tab text-muted-nav">
+        <span class="icon">📈</span>
+        <span class="lbl">분석</span>
     </div>
-    <div class="nav-tab">
-        <span class="icon">👤</span><span class="lbl">프로필</span>
+    <div class="nav-tab @(State.CurrentView == "Profile" ? "active" : "")" @onclick='() => State.ChangeView("Profile")'>
+        <span class="icon">👤</span>
+        <span class="lbl">프로필</span>
     </div>
 </div>
 
 <style>
-    .global-bottom-nav {
+    .dark-glass-nav {
         position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
-        height: 65px;
+        height: 75px;
         display: flex;
-        z-index: 100;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border-light);
+        padding-bottom: env(safe-area-inset-bottom);
     }
 
     .nav-tab {
@@ -32,22 +41,39 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #BDBDBD;
+        color: var(--text-muted);
         cursor: pointer;
-        transition: color 0.15s;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
     }
 
-        .nav-tab.active {
-            color: #2F80ED;
-            font-weight: bold;
-        }
+    .nav-tab.active {
+        color: var(--neon-green);
+        text-shadow: 0 0 10px var(--neon-green-glow);
+    }
 
-        .nav-tab .icon {
-            font-size: 18px;
-            margin-bottom: 2px;
-        }
+    .nav-tab .icon {
+        font-size: 19px;
+        margin-bottom: 3px;
+        transition: transform 0.2s ease;
+    }
 
-        .nav-tab .lbl {
-            font-size: 10px;
-        }
-</style>
+    .nav-tab:hover .icon {
+        transform: scale(1.1);
+    }
+
+    .nav-tab.active .icon {
+        transform: scale(1.15);
+    }
+
+    .nav-tab .lbl {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: -0.3px;
+    }
+
+    .text-muted-nav {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+</style>

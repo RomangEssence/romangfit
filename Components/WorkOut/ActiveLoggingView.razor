@@ -1,14 +1,39 @@
-﻿@inject Services.WorkoutStateService State
+@inject Services.WorkoutStateService State
 @implements IDisposable
 
-<div class="view-panel bg-light-gray p-3">
+<div class="view-panel dark-theme-bg p-3 d-flex flex-column h-100">
+    <!-- 상단 헤더 -->
     <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
-        <span class="fs-4 cursor-pointer" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
-        <h5 class="fw-bold m-0 text-dark">@DateTime.Today.ToString("M월 d일")</h5>
-        <div class="text-muted d-flex gap-3 fs-5"><span>📅</span><span>☰</span></div>
+        <span class="fs-4 cursor-pointer text-light-gray" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+        <h5 class="fw-bold m-0 text-white">@DateTime.Today.ToString("M월 d일")</h5>
+        <div class="text-muted-gray d-flex gap-3 fs-5">
+            <span class="cursor-pointer">📅</span>
+            <span class="cursor-pointer">☰</span>
+        </div>
     </div>
 
-    <div class="workout-scroll-zone flex-fill" style="overflow-y: auto; padding-bottom: 140px; scrollbar-width: none; -ms-overflow-style: none;">
+    <!-- ⏱️ 실시간 자동 휴식 타이머 HUD -->
+    @if (State.RestTimeRemaining > 0)
+    {
+        <div class="rest-timer-hud p-3 mb-3 rounded-4 d-flex align-items-center justify-content-between animated-fade">
+            <div class="d-flex align-items-center gap-2.5">
+                <span class="fs-5 pulse-icon">⏰</span>
+                <div>
+                    <span class="small text-muted-gray d-block fw-bold" style="font-size: 10px;">쉬는 시간</span>
+                    <span class="fw-extrabold text-neon fs-5 font-monospace">
+                        @($"{State.RestTimeRemaining / 60:D2}:{State.RestTimeRemaining % 60:D2}")
+                    </span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-neon-sm" @onclick="() => State.StartRestTimer(State.RestTimeRemaining + 30)">+30초</button>
+                <button class="btn btn-outline-danger-sm" @onclick="State.StopRestTimer">건너뛰기</button>
+            </div>
+        </div>
+    }
+
+    <!-- 운동 카드 리스트 스크롤 영역 -->
+    <div class="workout-scroll-zone flex-fill scroll-container">
         @if (State.ActiveWorkout != null && State.ActiveWorkout.Exercises.Any())
         {
             @foreach (var ex in State.ActiveWorkout.Exercises)
@@ -19,9 +44,9 @@
         else
         {
             <div class="text-center py-5 my-5 animated-fade">
-                <div class="fs-1 mb-2" style="opacity: 0.3;">📋</div>
-                <h6 class="fw-bold text-secondary">수행할 운동이 없습니다.</h6>
-                <button class="btn btn-outline-primary btn-sm rounded-pill px-3 mt-2 fw-bold"
+                <div class="fs-1 mb-2 opacity-50">📋</div>
+                <h6 class="fw-bold text-muted-gray">수행할 운동이 없습니다.</h6>
+                <button class="btn btn-neon-outline btn-sm rounded-pill px-4 mt-3 fw-bold"
                         @onclick='() => State.ChangeView("ExerciseSearch")'>
                     ＋ 운동 추가하기
                 </button>
@@ -29,19 +54,27 @@
         }
     </div>
 
-    <div class="bottom-action-tray p-3 bg-white border-top">
-        <div class="d-flex gap-2 mb-2">
-            <button class="btn flex-fill py-2 rounded-3 text-center border @(State.IsTimerOn ? "btn-soft-blue text-primary border-primary" : "bg-light")"
+    <!-- 하단 제어 및 운동 완료 버튼 트레이 -->
+    <div class="bottom-action-tray p-3 dark-glass border-top-dark">
+        <div class="d-flex gap-2 mb-3">
+            <!-- 휴식 타이머 활성/비활성 스위치 -->
+            <button class="btn flex-fill py-2 rounded-3 text-center border-0 @(State.IsTimerOn ? "btn-soft-neon" : "btn-dark-inactive")"
                     @onclick="State.ToggleTimer">
-                <small class="text-muted d-block" style="font-size:9px; font-weight:bold;">휴식 타이머</small>
-                <strong style="font-size:13px;">@(State.IsTimerOn ? "ON 01:30" : "OFF")</strong>
+                <small class="text-muted-gray d-block" style="font-size:9px; font-weight:bold;">자동 휴식 타이머</small>
+                <strong style="font-size:13px;" class="@(State.IsTimerOn ? "text-neon" : "text-muted-gray")">
+                    @(State.IsTimerOn ? "활성화됨" : "비활성화")
+                </strong>
             </button>
-            <div class="bg-light rounded-3 p-2 text-center flex-fill border">
-                <small class="text-muted d-block" style="font-size:9px; font-weight:bold;">운동 시간</small>
-                <strong class="text-dark" style="font-size:13px;">@State.ElapsedTime.ToString(@"hh\:mm\:ss")</strong>
+            
+            <!-- 실시간 운동 진행 시간 -->
+            <div class="bg-darker-card rounded-3 p-2 text-center flex-fill border-light-glow">
+                <small class="text-muted-gray d-block" style="font-size:9px; font-weight:bold;">진행 시간</small>
+                <strong class="text-white font-monospace" style="font-size:13px;">@State.ElapsedTime.ToString(@"hh\:mm\:ss")</strong>
             </div>
         </div>
-        <button class="btn btn-burn-primary w-100 py-3 rounded-3 fw-bold fs-5 shadow"
+        
+        <!-- 운동 완료 버튼 -->
+        <button class="btn btn-neon-primary w-100 py-3 rounded-3 fw-bold fs-5 shadow"
                 @onclick="State.CompleteWorkoutAsync">
             운동 완료
         </button>
@@ -49,18 +82,84 @@
 </div>
 
 <style>
-    .bg-light-gray {
-        background-color: #F6F8FA !important;
+    .dark-theme-bg {
+        background-color: var(--bg-dark) !important;
     }
 
-    .btn-soft-blue {
-        background-color: #EBF3FF !important;
+    .text-light-gray {
+        color: var(--text-light-gray) !important;
     }
 
-    .btn-burn-primary {
-        background-color: #2F80ED;
-        color: white;
-        border: none;
+    .text-muted-gray {
+        color: var(--text-muted) !important;
+    }
+
+    .text-neon {
+        color: var(--neon-green) !important;
+    }
+
+    .border-top-dark {
+        border-top: 1px solid var(--border-light);
+    }
+
+    .border-light-glow {
+        border: 1px solid var(--border-light);
+    }
+
+    .bg-darker-card {
+        background-color: var(--bg-card-solid);
+    }
+
+    /* ⏱️ 휴식 타이머 HUD 디자인 */
+    .rest-timer-hud {
+        background: var(--neon-green-glow);
+        border: 1px solid rgba(0, 102, 255, 0.25);
+        box-shadow: 0 4px 20px var(--neon-green-glow);
+    }
+
+    .pulse-icon {
+        animation: pulseKey 1.5s infinite alternate;
+    }
+
+    @@keyframes pulseKey {
+        from { transform: scale(1); opacity: 0.8; }
+        to { transform: scale(1.15); opacity: 1; }
+    }
+
+    .btn-outline-neon-sm {
+        background: transparent;
+        border: 1px solid var(--neon-green);
+        color: var(--neon-green);
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .btn-outline-neon-sm:hover {
+        background: var(--neon-green-glow);
+    }
+
+    .btn-outline-danger-sm {
+        background: transparent;
+        border: 1px solid #FF4D4D;
+        color: #FF4D4D;
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .btn-outline-danger-sm:hover {
+        background: rgba(255, 77, 77, 0.1);
+    }
+
+    .btn-soft-neon {
+        background-color: var(--neon-green-glow) !important;
+        border: 1px solid rgba(0, 102, 255, 0.15) !important;
+    }
+
+    .btn-dark-inactive {
+        background-color: var(--bg-card-solid) !important;
+        border: 1px solid var(--border-light) !important;
     }
 
     .bottom-action-tray {
@@ -69,20 +168,32 @@
         left: 0;
         width: 100%;
         z-index: 100;
-        box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
+    }
+
+    .dark-glass {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border-light);
+    }
+
+    .workout-scroll-zone {
+        padding-bottom: 150px;
+    }
+
+    .scroll-container {
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+    .scroll-container::-webkit-scrollbar {
+        display: none;
     }
 
     .cursor-pointer {
         cursor: pointer;
     }
-
-    .workout-scroll-zone::-webkit-scrollbar {
-        display: none;
-    }
 </style>
 
 @code {
-    // 🌟 자식 컴포넌트가 직접 전역 상태 엔진을 실시간 구독하여 파라미터 억까 우회
     protected override void OnInitialized()
     {
         State.OnStateChanged += HandleStateChanged;
@@ -97,4 +208,4 @@
     {
         State.OnStateChanged -= HandleStateChanged;
     }
-}
+}

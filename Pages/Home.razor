@@ -1,10 +1,19 @@
-﻿@page "/"
+@page "/"
 @inject Services.WorkoutStateService State
 @implements IDisposable
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
 <div class="burnfit-app-shell shadow">
+    <!-- 스마트폰 상단 상태바 & 노치 시뮬레이터 -->
+    <div class="phone-notch-bar">
+        <span>@DateTime.Now.ToString("HH:mm")</span>
+        <div class="d-flex gap-1.5 align-items-center">
+            <span>📶</span>
+            <span>5G</span>
+            <span>🔋</span>
+        </div>
+    </div>
 
     @switch (State.CurrentView)
     {
@@ -31,53 +40,17 @@
         case "RoutineEdit":
             <RoutineEditView />
             break;
+
+        case "Profile":
+            <ProfileView />
+            break;
     }
 
-    @if (State.CurrentView == "Dashboard" || State.CurrentView == "RoutineSelect")
+    @if (State.CurrentView == "Dashboard" || State.CurrentView == "RoutineSelect" || State.CurrentView == "Profile")
     {
         <GlobalBottomNav />
     }
 </div>
-
-<style>
-    .burnfit-app-shell {
-        width: 430px;
-        height: 860px;
-        margin: 2rem auto;
-        background: linear-gradient(to bottom, #EBF3FF 0%, #F6F8FA 40%, #F6F8FA 100%);
-        position: relative;
-        border-radius: 40px;
-        overflow: hidden;
-        border: 8px solid #ffffff;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .view-panel {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-
-    .animated-fade {
-        animation: fIn 0.2s ease-out forwards;
-    }
-
-    @@keyframes fIn {
-        from {
-            opacity: 0;
-            transform: translateY(3px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
 
 @code {
     protected override async Task OnInitializedAsync()
@@ -95,4 +68,4 @@
     {
         State.OnStateChanged -= HandleStateChanged;
     }
-}
+}

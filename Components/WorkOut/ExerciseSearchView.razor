@@ -1,108 +1,437 @@
-﻿@inject Services.WorkoutStateService State
+@inject Services.WorkoutStateService State
 
-<div class="view-panel p-3 bg-white animated-fade flex-fill d-flex flex-column" style="height: 100%;">
-    <div class="d-flex align-items-center mb-3">
-        <span class="fs-4 cursor-pointer me-3 text-dark fw-bold"
-              @onclick='() => State.ChangeView(State.EditingRoutine != null ? "RoutineEdit" : "RoutineSelect")'>‹</span>
-        <h5 class="fw-bold m-0 flex-fill text-center text-dark">운동 선택</h5>
+<div class="view-panel p-3 dark-theme-bg flex-fill d-flex flex-column h-100">
+    <!-- 상단 헤더 -->
+    <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
+        <span class="fs-4 cursor-pointer text-light-gray" @onclick="GoBack">‹</span>
+        <h5 class="fw-bold m-0 text-white flex-fill text-center">운동 선택</h5>
+        <button class="btn btn-outline-neon btn-sm rounded-pill px-3" @onclick="ToggleAddCustomForm">
+            @(showCustomForm ? "목록 보기" : "＋ 커스텀")
+        </button>
     </div>
 
-    <div class="mb-3 position-relative">
-        <input type="text" class="form-control rounded-3 border-0 bg-light ps-3 py-2" style="background-color:#F2F4F7 !important;" placeholder="찾으시는 운동을 검색해보세요." />
-    </div>
-
-    <div class="d-flex gap-2 overflow-auto pb-2 mb-3 no-scrollbar" style="white-space: nowrap;">
-        <span class="badge rounded-pill bg-burn-blue px-3 py-2 cursor-pointer">🔖</span>
-        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">전체</span>
-        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">하체</span>
-        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">가슴</span>
-        <span class="badge rounded-pill text-dark border px-3 py-2 cursor-pointer" style="background-color:#F2F4F7;">등</span>
-    </div>
-
-    <div class="list-group list-group-flush mt-2 flex-fill" style="overflow-y: auto; padding-bottom:90px; scrollbar-width:none;">
-        @foreach (var ex in FlatExercisePool)
-        {
-            var currentEx = ex; // 클로저 안전 스코프 락
-            <label class="list-group-item border-0 d-flex align-items-center gap-3 py-3 px-1 cursor-pointer rounded-3 hover-bg">
-                <input type="checkbox" class="form-check-input burn-checkbox"
-                       checked="@State.CheckedExercises.Any(e => e.Name == currentEx.Name)"
-                       @onchange="() => State.ToggleExerciseCheck(currentEx)" />
-                <div class="avatar-circle">@currentEx.IconPlaceholder</div>
-                <div class="flex-fill">
-                    <span class="small text-muted d-block" style="font-size:11px;">@currentEx.Category</span>
-                    <span class="fw-bold text-dark">@currentEx.Name</span>
-                </div>
-            </label>
-        }
-    </div>
-
-    @if (State.CheckedExercises.Any())
+    @if (showCustomForm)
     {
-        <div class="bottom-action-tray p-3 bg-white border-top shadow-lg" style="position: absolute; bottom: 0; left: 0; width: 100%; z-index: 100;">
-            <div class="d-flex gap-2">
-                <button class="btn btn-light border rounded-3 px-3 fw-bold text-secondary">＋</button>
-                <button class="btn btn-burn-primary flex-fill py-3 rounded-3 fw-bold" @onclick="State.ConfirmAddExercises">
-                    @State.CheckedExercises.Count 개의 운동 추가하기
-                </button>
+        <!-- 커스텀 운동 추가 폼 -->
+        <div class="custom-exercise-card p-3 rounded-4 animated-fade flex-fill overflow-y-auto">
+            <h6 class="fw-bold text-neon mb-3">나만의 운동 추가</h6>
+            
+            <div class="mb-3">
+                <label class="form-label text-muted-gray small">운동명</label>
+                <input type="text" class="form-control dark-input" @bind="newExName" placeholder="예: 레그 프레스" />
             </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted-gray small">부위 분류</label>
+                <select class="form-select dark-input" @bind="newExCategory">
+                    <option value="하체">하체</option>
+                    <option value="가슴">가슴</option>
+                    <option value="등">등</option>
+                    <option value="어깨">어깨</option>
+                    <option value="팔">팔</option>
+                    <option value="유산소">유산소</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted-gray small">주요 자극 부위</label>
+                <input type="text" class="form-control dark-input" @bind="newExTarget" placeholder="예: 대퇴사두근, 대둔근" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted-gray small">대표 이모지</label>
+                <input type="text" class="form-control dark-input" @bind="newExIcon" placeholder="예: 🦵 또는 🏋️" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted-gray small">운동 가이드 설명</label>
+                <textarea class="form-control dark-input" rows="3" @bind="newExDesc" placeholder="올바른 운동 방법이나 팁을 적어주세요."></textarea>
+            </div>
+
+            <button class="btn btn-neon w-100 py-3 rounded-3 fw-bold mt-2" @onclick="SaveCustomExercise">
+                운동 라이브러리에 저장
+            </button>
         </div>
+    }
+    else
+    {
+        <!-- 운동 검색 및 카테고리 필터 -->
+        <div class="mb-3 position-relative">
+            <input type="text" class="form-control dark-input rounded-3 ps-3 py-2" 
+                   @bind-value="searchText" @bind-value:event="oninput"
+                   placeholder="찾으시는 운동을 검색해보세요." />
+        </div>
+
+        <div class="d-flex gap-1 overflow-auto pb-5 mb-3 no-scrollbar" style="white-space: nowrap; padding-right: 16px;">
+            <span class="badge rounded-pill @(selectedCategory == "전체" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("전체")'>전체</span>
+            <span class="badge rounded-pill @(selectedCategory == "하체" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("하체")'>하체</span>
+            <span class="badge rounded-pill @(selectedCategory == "가슴" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("가슴")'>가슴</span>
+            <span class="badge rounded-pill @(selectedCategory == "등" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("등")'>등</span>
+            <span class="badge rounded-pill @(selectedCategory == "어깨" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("어깨")'>어깨</span>
+            <span class="badge rounded-pill @(selectedCategory == "팔" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("팔")'>팔</span>
+            <span class="badge rounded-pill @(selectedCategory == "유산소" ? "bg-neon" : "bg-dark-chip text-muted-gray") px-3 py-2 cursor-pointer" style="min-block-size: fit-content;"
+                  @onclick='() => SetCategory("유산소")'>유산소</span>
+        </div>
+
+        <!-- 운동 목록 리스트 -->
+        <div class="flex-fill scroll-container pb-5">
+            @if (!FilteredExercises.Any())
+            {
+                <div class="text-center py-5 text-muted-gray">
+                    검색 결과와 일치하는 운동이 없습니다.
+                </div>
+            }
+            else
+            {
+                @foreach (var ex in FilteredExercises)
+                {
+                    var currentEx = ex; // 클로저 안전 락
+                    bool isChecked = State.CheckedExercises.Any(e => e.Id == currentEx.Id);
+                    bool isDetailOpen = detailedExerciseId == currentEx.Id;
+
+                    <div class="exercise-item-container mb-2 rounded-4 overflow-hidden border-dark-glow">
+                        <!-- 항목 본문 -->
+                        <div class="d-flex align-items-center gap-3 py-3 px-3 cursor-pointer select-row @(isChecked ? "checked" : "")" @onclick="() => State.ToggleExerciseCheck(currentEx)">
+                            <div class="flex-shrink-0">
+                                @if (isChecked)
+                                {
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" fill="#34C759"/>
+                                        <path d="M8 12L11 15L16 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                }
+                                else
+                                {
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="var(--border-light)" stroke-width="2"/>
+                                    </svg>
+                                }
+                            </div>
+                            
+                            <div class="avatar-circle">
+                                @if (!string.IsNullOrEmpty(currentEx.ReferenceImage))
+                                {
+                                    <img src="@currentEx.ReferenceImage"
+                                        alt="@currentEx.Name"
+                                        style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />
+                                }
+                                else
+                                {
+                                    @currentEx.Icon
+                                }
+                            </div>
+                            
+                            <div class="flex-fill">
+                                <span class="small text-muted-gray d-block mb-0.5">@currentEx.Category</span>
+                                <span class="fw-bold text-white">@currentEx.Name</span>
+                                @if (!string.IsNullOrEmpty(currentEx.TargetMuscles))
+                                {
+                                    <span class="text-neon ms-2" style="font-size:10px;">@currentEx.TargetMuscles</span>
+                                }
+                            </div>
+
+                            <span class="text-muted-gray arrow-detail @(isDetailOpen ? "rotated" : "")" 
+                                  @onclick="() => ToggleDetail(currentEx.Id)" @onclick:stopPropagation>▼</span>
+                        </div>
+
+                        <!-- 아코디언 운동 정보 디테일 -->
+                        @if (isDetailOpen)
+                        {
+                            <div class="p-3 bg-darker-card border-top-dark animated-fade text-light-gray" style="font-size: 13px;">
+                                @if (!string.IsNullOrEmpty(currentEx.Description))
+                                {
+                                    <p class="mb-2 text-muted-gray">@currentEx.Description</p>
+                                }
+                                else
+                                {
+                                    <p class="mb-2 text-muted-gray italic">수정/등록된 상세 정보가 없습니다.</p>
+                                }
+
+                                @if (currentEx.IsCustom)
+                                {
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button class="btn btn-outline-danger btn-xs py-1 px-2 rounded-2" 
+                                                @onclick="() => DeleteCustomExercise(currentEx.Id)">
+                                            삭제
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- 하단 액션 트레이 -->
+        @if (State.CheckedExercises.Any())
+        {
+            <div class="bottom-action-tray p-3 dark-glass shadow-lg animate-slide-up">
+                <div class="d-flex gap-2 align-items-center">
+                    <div class="checked-count text-neon fw-bold me-2 px-2.5 py-1.5 rounded border-light-glow" style="background-color: var(--bg-card-solid); font-size: 12px; white-space: nowrap;">
+                        @(State.CheckedExercises.Count)개 선택됨
+                    </div>
+                    <button class="btn btn-neon flex-fill py-3 rounded-3 fw-bold" @onclick="State.ConfirmAddExercises">
+                        운동 리스트에 추가
+                    </button>
+                </div>
+            </div>
+        }
     }
 </div>
 
 <style>
-    .bg-burn-blue {
-        background-color: #2F80ED !important;
+    .dark-theme-bg {
+        background-color: var(--bg-dark) !important;
     }
 
-    .btn-burn-primary {
-        background-color: #2F80ED;
-        color: white;
+    .text-muted-gray {
+        color: var(--text-muted) !important;
+    }
+
+    .text-light-gray {
+        color: var(--text-light-gray) !important;
+    }
+
+    .text-neon {
+        color: var(--neon-green) !important;
+    }
+
+    .bg-neon {
+        background-color: var(--neon-green) !important;
+    }
+
+    .bg-dark-chip {
+        background-color: var(--bg-card-solid) !important;
+    }
+
+    .btn-outline-neon {
+        border: 1px solid var(--neon-green);
+        color: var(--neon-green);
+        background: transparent;
+    }
+    .btn-outline-neon:hover {
+        background-color: var(--neon-green-glow);
+        color: var(--neon-green);
+    }
+
+    .btn-neon {
+        background-color: var(--neon-green);
+        color: #FFFFFF;
         border: none;
+    }
+    .btn-neon:hover {
+        background-color: #0052cc;
+        box-shadow: 0 0 15px var(--neon-green-glow);
+    }
+
+    .dark-input {
+        background-color: var(--bg-card-solid) !important;
+        border: 1px solid var(--border-light) !important;
+        color: var(--text-primary) !important;
+    }
+    .dark-input::placeholder {
+        color: var(--text-muted);
+    }
+    .dark-input:focus {
+        border-color: var(--neon-green) !important;
+        box-shadow: 0 0 0 0.2rem var(--neon-green-glow) !important;
+    }
+
+    .custom-exercise-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-light);
+    }
+
+    .exercise-item-container {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-light);
+        transition: border 0.2s, box-shadow 0.2s;
+        flex-shrink: 0;
+    }
+
+    .border-dark-glow {
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .select-row.checked {
+        background-color: var(--neon-green-glow);
+    }
+
+    .bg-darker-card {
+        background-color: var(--bg-card-solid);
+    }
+
+    .border-top-dark {
+        border-top: 1px solid var(--border-light);
     }
 
     .avatar-circle {
-        width: 40px;
-        height: 40px;
-        background-color: #F2F4F7;
+        width: 42px;
+        height: 42px;
+        background-color: var(--bg-card-solid);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 20px;
+        color: var(--text-primary);
     }
 
-    .burn-checkbox {
-        width: 22px;
-        height: 22px;
-        border-radius: 6px;
-        border: 2px solid #D0D5DD;
-        cursor: pointer;
-    }
 
-        .burn-checkbox:checked {
-            background-color: #2F80ED;
-            border-color: #2F80ED;
-        }
+    .arrow-detail {
+        display: inline-block;
+        font-size: 10px;
+        transition: transform 0.2s;
+    }
+    .arrow-detail.rotated {
+        transform: rotate(-180deg);
+        color: var(--neon-green);
+    }
 
     .no-scrollbar::-webkit-scrollbar {
         display: none;
     }
 
-    .hover-bg:hover {
-        background-color: #F6F8FA;
+    .scroll-container {
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+    .scroll-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .dark-glass {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border-light);
+    }
+
+    .bottom-action-tray {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+    }
+
+    .btn-outline-danger {
+        border: 1px solid #ff4d4d;
+        color: #ff4d4d;
+        background: transparent;
+        font-size: 11px;
+    }
+    .btn-outline-danger:hover {
+        background: rgba(255, 77, 77, 0.1);
+        color: #ff4d4d;
+    }
+
+    .btn-xs {
+        padding: 0.15rem 0.5rem;
+    }
+
+    .italic {
+        font-style: italic;
     }
 </style>
 
 @code {
-    private List<Models.Exercise> FlatExercisePool => new() {
-        new() { Name = "스쿼트", Category = "하체", IconPlaceholder = "🏋️" },
-        new() { Name = "데드리프트", Category = "등", IconPlaceholder = "🏋️" },
-        new() { Name = "벤치프레스", Category = "가슴", IconPlaceholder = "🏋️" },
-        new() { Name = "시티드 Leg Curl", Category = "하체", IconPlaceholder = "🦵" },
-        new() { Name = "수평 레그 프레스", Category = "하체", IconPlaceholder = "🏋️" },
-        new() { Name = "케이블 푸시 다운", Category = "팔", IconPlaceholder = "💪" },
-        new() { Name = "리어 델토이드 플라이 머신", Category = "어깨", IconPlaceholder = "🦅" },
-        new() { Name = "레터럴 와이드 풀다운", Category = "등", IconPlaceholder = "👐" },
-        new() { Name = "싸이클", Category = "유산소", IconPlaceholder = "🚴", IsCardio = true }
-    };
+    private string searchText = "";
+    private string selectedCategory = "전체";
+    private string detailedExerciseId = "";
+
+    // 커스텀 운동 추가 폼 관련 변수
+    private bool showCustomForm = false;
+    private string newExName = "";
+    private string newExCategory = "하체";
+    private string newExTarget = "";
+    private string newExIcon = "🏋️";
+    private string newExDesc = "";
+
+    private IEnumerable<Models.ExerciseDefinition> FilteredExercises =>
+        State.ExerciseDefinitions
+            .Where(e => selectedCategory == "전체" || e.Category == selectedCategory)
+            .Where(e => string.IsNullOrWhiteSpace(searchText) || 
+                        e.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                        (e.TargetMuscles != null && e.TargetMuscles.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
+
+    private void SetCategory(string category)
+    {
+        selectedCategory = category;
+        detailedExerciseId = "";
+    }
+
+    private void ToggleDetail(string id)
+    {
+        detailedExerciseId = detailedExerciseId == id ? "" : id;
+    }
+
+    private void ToggleAddCustomForm()
+    {
+        showCustomForm = !showCustomForm;
+        ResetForm();
+    }
+
+    private void ResetForm()
+    {
+        newExName = "";
+        newExCategory = "하체";
+        newExTarget = "";
+        newExIcon = "🏋️";
+        newExDesc = "";
+    }
+
+    private async Task SaveCustomExercise()
+    {
+        if (string.IsNullOrWhiteSpace(newExName))
+        {
+            return;
+        }
+
+        var customDef = new Models.ExerciseDefinition
+        {
+            Code = "CUSTOM",
+            Name = newExName.Trim(),
+            Category = newExCategory,
+            TargetMuscles = newExTarget.Trim(),
+            Icon = string.IsNullOrWhiteSpace(newExIcon) ? "🏋️" : newExIcon.Trim(),
+            Description = newExDesc.Trim(),
+            IsCustom = true
+        };
+
+        await State.AddCustomExerciseDefinitionAsync(customDef);
+        showCustomForm = false;
+        ResetForm();
+    }
+
+    private async Task DeleteCustomExercise(string id)
+    {
+        await State.DeleteCustomExerciseDefinitionAsync(id);
+        if (detailedExerciseId == id)
+        {
+            detailedExerciseId = "";
+        }
+    }
+
+    private void GoBack()
+    {
+        if (State.EditingRoutine != null)
+        {
+            State.ChangeView("RoutineEdit");
+        }
+        else if (State.ActiveWorkout != null && State.ActiveWorkout.Exercises.Any())
+        {
+            State.ChangeView("ActiveLogging");
+        }
+        else
+        {
+            State.ChangeView("RoutineSelect");
+        }
+    }
 }

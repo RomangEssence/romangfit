@@ -1,0 +1,443 @@
+@inject Services.WorkoutStateService State
+@inject Services.FirebaseService Firebase
+
+<div class="view-panel animated-fade d-flex flex-column justify-content-between h-100 dark-bg">
+    <div class="flex-fill scroll-zone px-3">
+        <!-- 상단 헤더 -->
+        <div class="d-flex justify-content-between align-items-center py-3">
+            <h5 class="fw-bold text-white m-0" style="font-size: 18px; letter-spacing: -0.5px;">👤 프로필 및 동기화</h5>
+            <span class="badge bg-neon-dark text-neon rounded-pill px-3 py-1.5 fw-bold" style="font-size: 10px;">FIREBASE SYNC</span>
+        </div>
+
+        @if (!State.IsFirebaseConfigured)
+        {
+            <!-- 1단계: Firebase 설정이 되지 않은 경우 -->
+            <div class="premium-card p-4 border-0">
+                <div class="text-center mb-3">
+                    <span class="display-6">⚙️</span>
+                    <h6 class="fw-bold text-white mt-2 mb-1">클라우드 데이터베이스 연동</h6>
+                    <p class="text-muted-gray small">모든 기기에서 실시간으로 운동 기록을 동기화하기 위해 Firebase 설정을 입력해 주세요.</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-white small fw-semibold">설정 JSON 붙여넣기 (자동 채우기)</label>
+                    <textarea class="form-control bg-dark-input text-white small" rows="4" 
+                              placeholder='Firebase 웹 앱 설정(firebaseConfig 객체)을 여기에 붙여넣어 보세요...'
+                              @bind="_rawConfigJson"></textarea>
+                    <button class="btn btn-neon-outline w-100 mt-2 btn-sm fw-semibold" @onclick="AutofillConfig">
+                        ⚡ 설정 자동 파싱 및 입력
+                    </button>
+                </div>
+
+                <hr class="border-light-separator my-3" />
+
+                <div class="mb-2.5">
+                    <label class="form-label text-white small">API Key (apiKey)</label>
+                    <input type="text" class="form-control bg-dark-input text-white" @bind="_config.ApiKey" />
+                </div>
+                <div class="mb-2.5">
+                    <label class="form-label text-white small">Project ID (projectId)</label>
+                    <input type="text" class="form-control bg-dark-input text-white" @bind="_config.ProjectId" />
+                </div>
+                <div class="mb-2.5">
+                    <label class="form-label text-white small">Auth Domain (authDomain)</label>
+                    <input type="text" class="form-control bg-dark-input text-white" @bind="_config.AuthDomain" />
+                </div>
+                <div class="mb-3.5">
+                    <label class="form-label text-white small">App ID (appId)</label>
+                    <input type="text" class="form-control bg-dark-input text-white" @bind="_config.AppId" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger py-2 px-3 small border-0 text-white rounded-3 mb-3">
+                        ⚠️ @_errorMessage
+                    </div>
+                }
+
+                <button class="btn btn-neon-primary w-100 py-2.5 rounded-3 fw-bold small" @onclick="SaveFirebaseConfig">
+                    설정 저장 및 연동 완료
+                </button>
+            </div>
+        }
+        else if (!State.IsFirebaseLoggedIn)
+        {
+            <!-- 2단계: Firebase는 설정되었으나 로그인이 안 된 경우 -->
+            <div class="premium-card p-4 border-0">
+                <div class="d-flex justify-content-between mb-3.5 border-bottom-nav">
+                    <button class="tab-btn @(_isLoginTab ? "active" : "")" @onclick="() => SetTab(true)">로그인</button>
+                    <button class="tab-btn @(!_isLoginTab ? "active" : "")" @onclick="() => SetTab(false)">회원가입</button>
+                </div>
+
+                <div class="text-center mb-3">
+                    <span class="fs-2">🔐</span>
+                    <h6 class="fw-bold text-white mt-1">@(_isLoginTab ? "계정 로그인" : "신규 가입")</h6>
+                    <p class="text-muted-gray small">
+                        로그인 시 브라우저(IndexedDB)의 운동 일지와 루틴이 클라우드 DB로 자동 백업됩니다.
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-white small">이메일 주소</label>
+                    <input type="email" class="form-control bg-dark-input text-white" placeholder="yourname@domain.com" @bind="_authEmail" />
+                </div>
+                <div class="mb-3.5">
+                    <label class="form-label text-white small">비밀번호</label>
+                    <input type="password" class="form-control bg-dark-input text-white" placeholder="••••••••" @bind="_authPassword" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger py-2 px-3 small border-0 text-white rounded-3 mb-3">
+                        ⚠️ @_errorMessage
+                    </div>
+                }
+
+                @if (_isLoading)
+                {
+                    <div class="text-center py-2">
+                        <div class="spinner-border spinner-border-sm text-neon" role="status"></div>
+                        <span class="text-muted-gray small ms-2">진행 중...</span>
+                    </div>
+                }
+                else
+                {
+                    <button class="btn btn-neon-primary w-100 py-2.5 rounded-3 fw-bold small" @onclick="ExecuteAuth">
+                        @(_isLoginTab ? "로그인 완료" : "회원가입 및 데이터 연동")
+                    </button>
+                }
+
+                <button class="btn btn-neon-outline w-100 mt-2 py-2 rounded-3 small" @onclick="ResetConfig">
+                    연동 Firebase 초기화 (설정 변경)
+                </button>
+            </div>
+        }
+        else
+        {
+            <!-- 3단계: 로그인 완료 & 동기화 작동 상태 -->
+            <div class="premium-card p-4 border-0">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="avatar-circle">👤</div>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold text-white m-0" style="font-size: 15px;">@State.CurrentUser?.Email</h6>
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-35 rounded-pill px-2.5 py-1 mt-1 small" style="font-size: 10px;">
+                            🟢 실시간 클라우드 동기화 활성화됨
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="border-light-separator my-3" />
+
+                <h6 class="fw-bold text-white small mb-3">📦 클라우드 데이터 적재 현황</h6>
+                
+                <div class="sync-stats-grid">
+                    <div class="sync-stat-item">
+                        <span class="num">@State.ExerciseDefinitions.Count</span>
+                        <span class="lbl">DB 운동 데이터</span>
+                    </div>
+                    <div class="sync-stat-item">
+                        <span class="num">@State.Routines.Count</span>
+                        <span class="lbl">내 루틴 목록</span>
+                    </div>
+                    <div class="sync-stat-item">
+                        <span class="num">@State.WorkoutHistory.Count</span>
+                        <span class="lbl">완료 운동 일지</span>
+                    </div>
+                </div>
+
+                <div class="alert alert-info py-2 px-3 small border-0 text-white rounded-3 mt-3.5 mb-0" style="background: rgba(0, 102, 255, 0.08);">
+                    💡 운동을 마친 후 완료하거나 루틴을 추가할 때 자동으로 이 계정의 Cloud Firestore DB에 안전하게 백업 및 동기화됩니다.
+                </div>
+            </div>
+
+            <!-- 관리용 버튼 박스 -->
+            <div class="premium-card p-3 border-0">
+                <button class="btn btn-neon-primary w-100 py-2.5 rounded-3 fw-bold small mb-2" @onclick="ForceSync">
+                    🔄 실시간 데이터 수동 동기화
+                </button>
+                <button class="btn btn-neon-outline w-100 py-2.5 rounded-3 small mb-2" @onclick="SignOut">
+                    로그아웃
+                </button>
+                <button class="btn btn-outline-danger w-100 py-2.5 rounded-3 border-opacity-25 small" @onclick="ResetConfig">
+                    연동 설정 해제 (초기화)
+                </button>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .bg-dark-input {
+        background-color: var(--bg-card-solid) !important;
+        border: 1px solid var(--border-light) !important;
+        color: var(--text-primary) !important;
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-size: 13px;
+        transition: border-color 0.2s;
+    }
+    .bg-dark-input:focus {
+        border-color: var(--neon-green) !important;
+        box-shadow: 0 0 0 3px var(--neon-green-glow);
+    }
+    .border-light-separator {
+        border-color: var(--border-light);
+        opacity: 0.15;
+    }
+    .border-bottom-nav {
+        border-bottom: 2px solid var(--border-light);
+        display: flex;
+        gap: 20px;
+    }
+    .tab-btn {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 14px;
+        padding: 10px 0;
+        position: relative;
+        transition: color 0.2s;
+    }
+    .tab-btn.active {
+        color: var(--neon-green);
+    }
+    .tab-btn.active::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--neon-green);
+    }
+    .avatar-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: var(--neon-green-glow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: var(--neon-green);
+        border: 1px solid rgba(0, 102, 255, 0.2);
+    }
+    .sync-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    .sync-stat-item {
+        background: var(--bg-card-solid);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 12px 6px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+    }
+    .sync-stat-item .num {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--neon-green);
+    }
+    .sync-stat-item .lbl {
+        font-size: 9px;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-weight: 500;
+    }
+</style>
+
+@code {
+    private string _rawConfigJson = string.Empty;
+    private FirebaseConfig _config = new();
+    private string _errorMessage = string.Empty;
+    
+    private bool _isLoginTab = true;
+    private string _authEmail = string.Empty;
+    private string _authPassword = string.Empty;
+    private bool _isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 이미 저장된 설정이 있으면 채워넣기
+        var savedConfig = await Firebase.GetCurrentUserAsync();
+        if (State.IsFirebaseConfigured)
+        {
+            // 설정 복구
+            var localConfigStr = await Firebase.GetCurrentUserAsync(); // placeholder
+        }
+    }
+
+    private void SetTab(bool isLogin)
+    {
+        _isLoginTab = isLogin;
+        _errorMessage = string.Empty;
+    }
+
+    private void AutofillConfig()
+    {
+        _errorMessage = string.Empty;
+        if (string.IsNullOrWhiteSpace(_rawConfigJson))
+        {
+            _errorMessage = "텍스트 필드가 비어있습니다. Firebase 설정 코드를 붙여넣어 주세요.";
+            return;
+        }
+
+        try
+        {
+            // JavaScript 객체 포맷을 JSON으로 클렌징하는 정규표현식 매핑
+            string cleaned = _rawConfigJson;
+            
+            // 1. 객체 변수 선언 제거 (e.g. const firebaseConfig = or var config = )
+            var declIndex = cleaned.IndexOf("{");
+            if (declIndex != -1)
+            {
+                cleaned = cleaned.Substring(declIndex);
+            }
+            var endIndex = cleaned.LastIndexOf("}");
+            if (endIndex != -1)
+            {
+                cleaned = cleaned.Substring(0, endIndex + 1);
+            }
+
+            // 2. 키값에 따옴표가 없는 경우 쌍따옴표 추가 (e.g. apiKey: => "apiKey":)
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"([a-zA-Z0-9_]+)\s*:", "\"$1\":");
+            
+            // 3. 작은따옴표를 큰따옴표로 변환
+            cleaned = cleaned.Replace("'", "\"");
+            
+            // 4. 주석 제거
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @"//.*", "");
+            
+            // 5. 콤마 정리 및 다듬기
+            cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, @",\s*}", "}");
+
+            var parsed = System.Text.Json.JsonSerializer.Deserialize<FirebaseConfig>(cleaned, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (parsed != null && !string.IsNullOrEmpty(parsed.ApiKey))
+            {
+                _config = parsed;
+                _rawConfigJson = string.Empty; // 성공 시 클리어
+            }
+            else
+            {
+                _errorMessage = "파싱은 되었으나 유효한 Firebase API Key를 찾을 수 없습니다.";
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"설정 파싱에 실패했습니다. 올바른 객체 형식인지 확인해 주세요. 오류: {ex.Message}";
+        }
+    }
+
+    private async Task SaveFirebaseConfig()
+    {
+        _errorMessage = string.Empty;
+        if (string.IsNullOrEmpty(_config.ApiKey) || string.IsNullOrEmpty(_config.ProjectId))
+        {
+            _errorMessage = "API Key와 Project ID는 필수 항목입니다.";
+            return;
+        }
+
+        var json = System.Text.Json.JsonSerializer.Serialize(_config, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+        });
+
+        var success = await State.InitializeFirebaseAsync(json);
+        if (!success)
+        {
+            _errorMessage = "Firebase 초기화에 실패했습니다. 입력값을 확인해 주세요.";
+        }
+    }
+
+    private async Task ExecuteAuth()
+    {
+        _errorMessage = string.Empty;
+        if (string.IsNullOrEmpty(_authEmail) || string.IsNullOrEmpty(_authPassword))
+        {
+            _errorMessage = "이메일과 비밀번호를 모두 입력해 주세요.";
+            return;
+        }
+
+        if (_authPassword.Length < 6)
+        {
+            _errorMessage = "비밀번호는 최소 6자리 이상이어야 합니다.";
+            return;
+        }
+
+        _isLoading = true;
+        try
+        {
+            bool success = false;
+            if (_isLoginTab)
+            {
+                success = await State.FirebaseSignInAsync(_authEmail, _authPassword);
+            }
+            else
+            {
+                success = await State.FirebaseSignUpAsync(_authEmail, _authPassword);
+            }
+
+            if (!success)
+            {
+                _errorMessage = _isLoginTab ? "로그인에 실패했습니다. 이메일 또는 비밀번호를 확인해 주세요." : "회원가입에 실패했습니다. 이미 존재하는 이메일이거나 형식에 맞지 않습니다.";
+            }
+        }
+        catch (Exception ex)
+        {
+            var msg = ex.Message;
+            if (msg.Contains("invalid-credential", StringComparison.OrdinalIgnoreCase))
+            {
+                _errorMessage = _isLoginTab 
+                    ? "로그인 실패: 이메일 또는 비밀번호가 올바르지 않거나 가입되지 않은 계정입니다. 회원가입 탭에서 먼저 계정을 만들어 주세요." 
+                    : "회원가입 실패: 이미 사용 중이거나 형식에 맞지 않는 이메일/비밀번호입니다.";
+            }
+            else if (msg.Contains("email-already-in-use", StringComparison.OrdinalIgnoreCase))
+            {
+                _errorMessage = "이미 가입된 이메일 주소입니다. 로그인 탭에서 로그인을 진행해 주세요.";
+            }
+            else if (msg.Contains("weak-password", StringComparison.OrdinalIgnoreCase))
+            {
+                _errorMessage = "비밀번호가 취약합니다. 6자리 이상의 복잡한 비밀번호를 사용해 주세요.";
+            }
+            else
+            {
+                _errorMessage = $"인증 처리 중 오류 발생: {ex.Message}";
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task ForceSync()
+    {
+        _isLoading = true;
+        await State.SyncWithFirebaseAsync();
+        _isLoading = false;
+    }
+
+    private async Task SignOut()
+    {
+        await State.FirebaseSignOutAsync();
+        _authEmail = string.Empty;
+        _authPassword = string.Empty;
+    }
+
+    private async Task ResetConfig()
+    {
+        await State.ClearFirebaseConfigAsync();
+        _config = new();
+        _rawConfigJson = string.Empty;
+        _errorMessage = string.Empty;
+    }
+}
