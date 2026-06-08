@@ -31,6 +31,9 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -o release
 
+      - name: Create .nojekyll
+        run: touch release/wwwroot/.nojekyll
+
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
