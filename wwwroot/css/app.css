@@ -229,3 +229,25 @@ body {
 .loading-progress-text:after {
     content: var(--blazor-load-percentage-text, "로딩 중...");
 }
+
+/* 실제 모바일 기기 대응: 시뮬레이터 제거 및 전체화면 대응 */
+@media (max-width: 500px) {
+    body {
+        background-color: var(--bg-dark);
+        align-items: stretch;
+    }
+    
+    .burnfit-app-shell {
+        width: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding-top: env(safe-area-inset-top) !important;
+    }
+
+    .phone-notch-bar {
+        display: none !important;
+    }
+}
