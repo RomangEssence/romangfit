@@ -13,10 +13,10 @@
     {
         <!-- 상단 헤더 -->
         <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
-            <span class="fs-4 cursor-pointer text-light-gray" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+            <span class="fs-4 cursor-pointer text-light-gray touch-target" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
             <input type="text" class="form-control mx-3 fw-bold text-center dark-input rounded-3"
                    style="font-size:15px; height: 38px;" @bind="State.EditingRoutine.Name" placeholder="루틴 이름" />
-            <span class="small fw-bold text-neon cursor-pointer text-nowrap" style="flex-shrink: 0; min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
+            <span class="small fw-bold text-neon cursor-pointer text-nowrap touch-target" style="flex-shrink: 0; min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
         </div>
 
         <!-- 운동 목록 편집 리스트 -->
@@ -236,6 +236,25 @@
     .spinner-border.text-neon {
         color: var(--neon-green) !important;
     }
+    /* 터치 영역 강제 확장 클래스 */
+    .touch-target {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .touch-target::after {
+            content: '';
+            position: absolute;
+            /* 중심축 기준으로 사방을 -12px씩 더 넓혀서 터치 영역 확보 */
+            top: -12px;
+            bottom: -12px;
+            left: -12px;
+            right: -12px;
+            /* 테스트해보고 싶다면 아래 주석을 풀어 붉은 영역을 확인해보세요 */
+            /* background-color: rgba(255, 0, 0, 0.3); */
+        }
 </style>
 
 @code {
