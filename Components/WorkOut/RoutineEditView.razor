@@ -1,6 +1,33 @@
 @using romangfit.Models
 @inject Services.WorkoutStateService State
+<div style="position: fixed; top: 0; left: 0; width: 100%; max-height: 250px; overflow-y: auto; background: #FF0055; color: white; z-index: 99999; font-size: 11px; padding: 12px; word-break: break-all; border-bottom: 3px solid black; font-family: monospace;">
+    <h6 style="margin: 0 0 5px 0; font-weight: bold; color: yellow;">[로망핏 실시간 데이터 디버거]</h6>
+    <b>1. EditingRoutine 객체 존재 여부:</b> @(State.EditingRoutine == null ? "❌ NULL (데이터 없음)" : "✅ 존재함") <br />
+    <b>2. 루틴 이름:</b> @(State.EditingRoutine?.Name ?? "이름 없음") <br />
+    <b>3. Exercises 리스트 상태:</b> @(State.EditingRoutine?.Exercises == null ? "❌ NULL" : $"✅ 개수: {State.EditingRoutine.Exercises.Count}개") <br />
 
+    @if (State.EditingRoutine?.Exercises != null && State.EditingRoutine.Exercises.Any())
+    {
+        var firstEx = State.EditingRoutine.Exercises.First();
+        <b>4. 첫 번째 운동 세트 상태:</b> 
+        @(firstEx.Sets == null ? "❌ Sets 객체가 NULL" : $"✅ 세트 개수: {firstEx.Sets.Count}개")
+        <br />
+    }
+
+    <details style="margin-top: 8px;">
+        <summary style="cursor:pointer; color: #00FFFF; font-weight:bold;">[클릭] 전체 RAW JSON 보기</summary>
+        <div style="background: rgba(0,0,0,0.5); padding: 5px; margin-top: 5px; max-height: 100px; overflow-y: auto;">
+            @try
+            {
+                @System.Text.Json.JsonSerializer.Serialize(State.EditingRoutine)
+            }
+            catch (Exception ex)
+            {
+                <span style="color:red;">JSON 직렬화 실패: @ex.Message</span>
+            }
+        </div>
+    </details>
+</div>
 <div class="view-panel dark-theme-bg w-100 h-100">
     @if (State.EditingRoutine == null)
     {
