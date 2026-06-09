@@ -1,85 +1,82 @@
 /* ==========================================
    RomangFit - Premium Dark Neon Theme Styles
    ========================================== */
-
 :root {
-    --bg-darker: #EDF2F7;
-    --bg-dark: #FFFFFF;
-    --bg-card: rgba(248, 250, 252, 0.85);
-    --bg-card-solid: #F1F5F9;
-    --border-light: rgba(15, 23, 42, 0.08);
-    --text-primary: #0F172A;
-    --text-muted: #64748B;
-    --neon-green: #0066FF;
-    --neon-green-glow: rgba(0, 102, 255, 0.12);
-    --neon-blue: #0EA5E9;
-    --neon-blue-glow: rgba(14, 165, 233, 0.15);
-    --danger-red: #EF4444;
+  --bg-darker: #EDF2F7;
+  --bg-dark: #FFFFFF;
+  --bg-card: rgba(248, 250, 252, 0.85);
+  --bg-card-solid: #F1F5F9;
+  --border-light: rgba(15, 23, 42, 0.08);
+  --text-primary: #0F172A;
+  --text-muted: #64748B;
+  --neon-green: #0066FF;
+  --neon-green-glow: rgba(0, 102, 255, 0.12);
+  --neon-blue: #0EA5E9;
+  --neon-blue-glow: rgba(14, 165, 233, 0.15);
+  --danger-red: #EF4444;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-darker);
-    font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
-    color: var(--text-primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-darker);
+  font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
-/* 폰 쉘 시뮬레이터 프레임 */
+/* 폰 쉘 시뮬레이터 프레임 (PC용) */
 .burnfit-app-shell {
-    width: 420px;
-    height: 860px;
-    background: var(--bg-dark);
-    position: relative;
-    border-radius: 48px;
-    overflow: hidden;
-    border: 12px solid #0F172A; /* Sleek slate phone ring */
-    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15),
-                0 0 0 1px rgba(15, 23, 42, 0.05) !important;
-    display: flex;
-    flex-direction: column;
+  width: 420px;
+  height: 860px;
+  background: var(--bg-dark);
+  position: relative;
+  border-radius: 48px;
+  overflow: hidden;
+  border: 12px solid #0F172A;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(15, 23, 42, 0.05) !important;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Global text-white overrides inside the light-theme app shell */
-.burnfit-app-shell .text-white {
+  .burnfit-app-shell .text-white {
     color: var(--text-primary) !important;
-}
+  }
 
-/* Ensure text on rich action buttons, delete zones, and active tabs stays readable (white) */
-.burnfit-app-shell .btn-neon-primary,
-.burnfit-app-shell .btn-neon-active,
-.burnfit-app-shell .btn-neon,
-.burnfit-app-shell .bg-neon,
-.burnfit-app-shell .bg-danger,
-.burnfit-app-shell .bg-danger .text-white,
-.burnfit-app-shell .swipe-delete-action,
-.burnfit-app-shell .swipe-delete-action .text-white,
-.burnfit-app-shell .btn-danger,
-.burnfit-app-shell .btn-outline-danger:hover {
+  .burnfit-app-shell .btn-neon-primary,
+  .burnfit-app-shell .btn-neon-active,
+  .burnfit-app-shell .btn-neon,
+  .burnfit-app-shell .bg-neon,
+  .burnfit-app-shell .bg-danger,
+  .burnfit-app-shell .bg-danger .text-white,
+  .burnfit-app-shell .swipe-delete-action,
+  .burnfit-app-shell .swipe-delete-action .text-white,
+  .burnfit-app-shell .btn-danger,
+  .burnfit-app-shell .btn-outline-danger:hover {
     color: #FFFFFF !important;
-}
+  }
 
-/* 스마트폰 노치 (다이내믹 아일랜드 느낌) */
+/* 스마트폰 노치 (PC 시뮬레이터용) */
 .phone-notch-bar {
-    height: 38px;
-    background-color: var(--bg-dark);
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 28px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-primary);
-    z-index: 1000;
-    user-select: none;
+  height: 38px;
+  background-color: var(--bg-dark);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 28px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  z-index: 1000;
+  user-select: none;
+  flex-shrink: 0; /* 노치 바 압착 방지 */
 }
 
-.phone-notch-bar::before {
+  .phone-notch-bar::before {
     content: "";
     position: absolute;
     top: 6px;
@@ -89,165 +86,169 @@ body {
     height: 24px;
     background-color: #000000;
     border-radius: 12px;
-}
+  }
 
-/* 뷰 패널 공통 스타일 */
+/* 뷰 패널 공통 구조 개편 */
 .view-panel {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    background-color: var(--bg-dark);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--bg-dark);
+  overflow: hidden; /* 패널 외부 유출 차단 */
 }
 
-/* 스크롤 영역 공통 */
+  /* 상단 타이틀/헤더 영역 압착 방지 */
+  .view-panel header,
+  .view-panel .header-zone,
+  .view-panel .tab-menu-container {
+    flex-shrink: 0 !important;
+  }
+
+/* 스크롤 영역 공통 수정 */
 .scroll-zone {
-    flex: 1;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-bottom: 90px;
+  flex: 1;
+  overflow-y: auto;
+  /* iOS에서 부드러운 스크롤 보장 */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 16px;
+  /* 하단 고정 내비바 크기와 safe-area를 감안한 여백 확보 */
+  padding-bottom: calc(85px + env(safe-area-inset-bottom));
 }
 
-.scroll-zone::-webkit-scrollbar {
+  .scroll-zone::-webkit-scrollbar {
     display: none;
+  }
+
+/* 하단 내비게이션 바 고정 및 아이폰 홈바 대응 */
+/* 클래스명이 하단 내비바에 지정되어 있다면 아래 속성을 병합하거나 새로 적용해 주세요 */
+.bottom-nav, .footer-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  flex-shrink: 0;
+  background-color: var(--bg-dark);
+  z-index: 999;
+  /* 아이폰 하단 인디케이터(홈 바) 영역만큼 아래 패딩을 동적으로 추가 */
+  padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
 }
 
 /* 글래스모피즘 프리미엄 카드 */
 .premium-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-light);
-    border-radius: 20px;
-    padding: 16px;
-    margin-bottom: 14px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s, border-color 0.2s;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05); /* 과도한 그림자 완화 */
+  transition: transform 0.2s, border-color 0.2s;
 }
 
-.premium-card:hover {
-    border-color: rgba(0, 255, 157, 0.2);
-}
+  .premium-card:hover {
+    border-color: rgba(0, 102, 255, 0.2);
+  }
 
 /* 버튼 테마 */
 .btn-neon-primary {
-    background-color: var(--neon-green) !important;
-    color: #FFFFFF !important;
-    font-weight: 700;
-    border: none;
-    box-shadow: 0 4px 14px var(--neon-green-glow);
-    transition: all 0.25s ease;
+  background-color: var(--neon-green) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 14px var(--neon-green-glow);
+  transition: all 0.25s ease;
 }
 
-.btn-neon-primary:hover {
+  .btn-neon-primary:hover {
     background-color: #0052cc !important;
     box-shadow: 0 6px 20px rgba(0, 102, 255, 0.4) !important;
     transform: translateY(-1px);
-}
+  }
 
 .btn-neon-outline {
-    background: transparent;
-    border: 1px solid var(--neon-green);
-    color: var(--neon-green);
-    font-weight: 600;
-    transition: all 0.2s;
+  background: transparent;
+  border: 1px solid var(--neon-green);
+  color: var(--neon-green);
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
-.btn-neon-outline:hover {
-    background: rgba(0, 255, 157, 0.1);
-    color: var(--neon-green);
-}
+  .btn-neon-outline:hover {
+    background: rgba(0, 102, 255, 0.1);
+  }
 
 /* 미크로 애니메이션 효과 */
 .animated-fade {
-    animation: fIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: fIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fIn {
-    from {
-        opacity: 0;
-        transform: translateY(4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-slide-up {
-    animation: sUp 0.3s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+  animation: sUp 0.3s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
 }
 
 @keyframes sUp {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
-/* Blazor 기본 에러 UI 숨기기 */
 #blazor-error-ui {
-    display: none !important;
+  display: none !important;
 }
 
 /* 로딩 화면 커스텀 */
 .loading-progress {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    inset: 35vh 0 auto 0;
-    margin: 0 auto;
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  inset: 35vh 0 auto 0;
+  margin: 0 auto;
 }
 
-.loading-progress circle {
-    fill: none;
-    stroke: rgba(15, 23, 42, 0.05);
-    stroke-width: 4px;
-    transform-origin: 50% 50%;
-    transform: rotate(-90deg);
-}
-
-.loading-progress circle:last-child {
-    stroke: var(--neon-green);
-    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.6), 500%;
-    transition: stroke-dasharray 0.05s ease-in-out;
-}
-
-.loading-progress-text {
-    position: absolute;
-    text-align: center;
-    font-weight: 500;
-    color: var(--text-muted);
-    font-size: 13px;
-    inset: calc(35vh + 70px) 0 auto 0;
-}
-
-.loading-progress-text:after {
-    content: var(--blazor-load-percentage-text, "로딩 중...");
-}
-
-/* 실제 모바일 기기 대응: 시뮬레이터 제거 및 전체화면 대응 */
+/* ==========================================
+   실제 모바일 기기 및 PWA 독립 실행 대응 
+   ========================================== */
 @media (max-width: 500px) {
-    body {
-        background-color: var(--bg-dark);
-        align-items: stretch;
-    }
-    
-    .burnfit-app-shell {
-        width: 100% !important;
-        height: 100vh !important;
-        height: 100dvh !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        padding-top: env(safe-area-inset-top) !important;
-    }
+  body {
+    background-color: var(--bg-dark);
+    align-items: stretch;
+    overflow: hidden; /* 바디 스크롤 차단 */
+  }
 
-    .phone-notch-bar {
-        display: none !important;
-    }
+  .burnfit-app-shell {
+    width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important; /* 모바일 동적 뷰포트 완벽 대응 */
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    /* 홈 화면 추가 시 상단 상태바 영역과 컨텐츠 겹침 방지 */
+    padding-top: env(safe-area-inset-top) !important;
+  }
+
+  /* 실제 모바일에서는 시뮬레이터용 검은색 가짜 노치 바 제거 */
+  .phone-notch-bar {
+    display: none !important;
+  }
 }
