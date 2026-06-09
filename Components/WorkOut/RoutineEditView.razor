@@ -109,15 +109,18 @@
 </div>
 
 <style>
-    /* 전체 패널 레이아웃 Flex 격리 체계화 */
+    /* 1. 전체 화면 레이아웃 격리 및 사파리 뷰포트 고정 */
     .view-panel {
         display: flex;
         flex-direction: column;
         overflow: hidden;
         position: relative;
+        /* 높은 확률로 h-100 부모 꼬임이 있을 수 있으므로 크기 강제 고정 */
+        width: 100% !important;
+        height: 100dvh !important;
     }
 
-    /* 상단 헤더존 - 아이폰 노치(상단 상태바) 여백 계산 및 수축 방지 */
+    /* 2. 상단 헤더존 (아이폰 노치 대응 및 수축 방지) */
     .header-zone {
         height: calc(45px + env(safe-area-inset-top));
         padding-top: env(safe-area-inset-top);
@@ -125,32 +128,36 @@
         z-index: 101;
     }
 
-    /* 본문 스크롤 영역만 깔끔하게 유동적으로 크기 배정 */
+    /* 3. 🚨 원인 해결의 핵심: 스크롤 영역을 absolute 트레이 위로 띄우기 */
     .scroll-container {
         flex: 1;
         overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: touch; /* iOS 가속 스크롤 보장 */
         scrollbar-width: none;
-        /* 하단 고정 트레이 높이(약 135px) + 아이폰 하단 홈 바 여백만큼 띄워서 가려짐 방지 */
-        padding-bottom: calc(145px + env(safe-area-inset-bottom)) !important;
+        /* 사파리에서 absolute 트레이(높이 약 140px) 밑으로
+               컨텐츠가 파묻혀 안 보이는 현상을 방지하기 위해
+               padding 대신 명시적인 하단 마진과 패딩 레이어를 결합합니다.
+            */
+        padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
     }
 
         .scroll-container::-webkit-scrollbar {
             display: none;
         }
 
-    /* 하단 트레이 고정 및 아이폰 홈바 대응 */
+    /* 4. 🚨 하단 고정 트레이 위치 및 높이값 사파리 최적화 */
     .bottom-action-tray {
-        position: absolute;
+        position: fixed; /* absolute에서 fixed로 변경하여 뷰포트 최하단에 강제 고정 */
         bottom: 0;
         left: 0;
         width: 100%;
-        z-index: 100;
+        height: calc(135px + env(safe-area-inset-bottom)); /* 높이를 명시하여 사파리 연산 유도 */
+        z-index: 110; /* 스크롤 컨텐츠보다 무조건 위에 오도록 설정 */
         flex-shrink: 0;
-        /* 아이폰 최하단 가로 인디케이터 바 여백 확보 */
         padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
     }
 
+    /* 테마 및 컴포넌트 기본 스타일 */
     .dark-theme-bg {
         background-color: var(--bg-dark) !important;
     }
@@ -211,9 +218,10 @@
     }
 
     .dark-glass {
-        background: rgba(255, 255, 255, 0.96) !important;
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        /* 사파리에서 컨텐츠가 밑으로 지나갈 때 이질감이 없도록 불투명도 조절 */
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
     }
 
     .swipe-container {
