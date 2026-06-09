@@ -1,33 +1,6 @@
 @using romangfit.Models
 @inject Services.WorkoutStateService State
-<div style="position: fixed; top: 0; left: 0; width: 100%; max-height: 250px; overflow-y: auto; background: #FF0055; color: white; z-index: 99999; font-size: 11px; padding: 12px; word-break: break-all; border-bottom: 3px solid black; font-family: monospace;">
-    <h6 style="margin: 0 0 5px 0; font-weight: bold; color: yellow;">[로망핏 실시간 데이터 디버거]</h6>
-    <b>1. EditingRoutine 객체 존재 여부:</b> @(State.EditingRoutine == null ? "❌ NULL (데이터 없음)" : "✅ 존재함") <br />
-    <b>2. 루틴 이름:</b> @(State.EditingRoutine?.Name ?? "이름 없음") <br />
-    <b>3. Exercises 리스트 상태:</b> @(State.EditingRoutine?.Exercises == null ? "❌ NULL" : $"✅ 개수: {State.EditingRoutine.Exercises.Count}개") <br />
 
-    @if (State.EditingRoutine?.Exercises != null && State.EditingRoutine.Exercises.Any())
-    {
-        var firstEx = State.EditingRoutine.Exercises.First();
-        <b>4. 첫 번째 운동 세트 상태:</b> 
-        @(firstEx.Sets == null ? "❌ Sets 객체가 NULL" : $"✅ 세트 개수: {firstEx.Sets.Count}개")
-        <br />
-    }
-
-    <details style="margin-top: 8px;">
-        <summary style="cursor:pointer; color: #00FFFF; font-weight:bold;">[클릭] 전체 RAW JSON 보기</summary>
-        <div style="background: rgba(0,0,0,0.5); padding: 5px; margin-top: 5px; max-height: 100px; overflow-y: auto;">
-            @try
-            {
-                @System.Text.Json.JsonSerializer.Serialize(State.EditingRoutine)
-            }
-            catch (Exception ex)
-            {
-                <span style="color:red;">JSON 직렬화 실패: @ex.Message</span>
-            }
-        </div>
-    </details>
-</div>
 <div class="view-panel dark-theme-bg w-100 h-100">
     @if (State.EditingRoutine == null)
     {
@@ -45,72 +18,79 @@
             <span class="small fw-bold text-neon cursor-pointer text-nowrap touch-target select-none" style="min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
         </div>
 
-        <div class="scroll-container px-3">
-            @if (State.EditingRoutine.Exercises == null || !State.EditingRoutine.Exercises.Any())
+        <div class="flex-fill scroll-container pb-5">
+            @try
             {
-                <div class="text-center py-5 my-4 bg-darker rounded-4 border-dashed">
-                    <p class="text-muted-gray small m-0">아래 버튼을 눌러<br />루틴에 포함할 운동을 추가하세요.</p>
-                </div>
-            }
-            else
-            {
-                @for (int i = 0; i < State.EditingRoutine.Exercises.Count; i++)
+                @if (State.EditingRoutine.Exercises == null || !State.EditingRoutine.Exercises.Any())
                 {
-                    var index = i;
-                    var ex = State.EditingRoutine.Exercises[index];
-                    if (ex == null) continue;
-                    var currentExId = ex.Id;
-
-                    <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4"
-                         draggable="true"
-                         @ondragstart="() => HandleDragStart(index)"
-                         @ondragover:preventDefault
-                         @ondragdrop="() => HandleDrop(index)">
-
-                        <div class="swipe-delete-action bg-danger d-flex align-items-center px-3 position-absolute start-0 top-0 h-100 cursor-pointer @(swipedExerciseId == currentExId ? "active" : "")"
-                             @onclick="() => State.RemoveExerciseFromEditing(currentExId)">
-                            <span class="text-white fw-bold" style="font-size:11px;">종목<br />삭제</span>
-                        </div>
-
-                        <div class="card premium-card border-0 m-0 position-relative transition-transform @(swipedExerciseId == currentExId ? "swiped" : "")"
-                             style="z-index: 10;"
-                             @onpointerdown="(e) => PointerDown(e)"
-                             @onpointerup="(e) => HandlePointerUp(e, currentExId)">
-
-                            <div class="d-flex justify-content-between align-items-center border-bottom-dark pb-2 mb-2">
-                                <span class="fw-bold text-white font-size-14 select-none" style="cursor: grab;">
-                                    <span class="drag-handle me-2">☰</span>
-                                    <span class="text-neon me-1">@ex.SetNumber</span> @ex.Name
-                                </span>
-                                <span class="text-muted-gray" style="font-size:11px;">@ex.Category</span>
-                            </div>
-
-                            @if (ex.Sets != null)
-                            {
-                                @for (int sIdx = 0; sIdx < ex.Sets.Count; sIdx++)
-                                {
-                                    var currentSet = ex.Sets[sIdx];
-                                    <div class="row g-2 text-center align-items-center mb-1.5" style="font-size: 13px;">
-                                        <div class="col-2 text-muted-gray fw-bold">@currentSet.SetNumber</div>
-                                        <div class="col-5 d-flex align-items-center gap-1.5">
-                                            <input type="number" inputmode="numeric" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Weight" />
-                                            <span class="text-muted-gray small">kg</span>
-                                        </div>
-                                        <div class="col-5 d-flex align-items-center gap-1.5">
-                                            <input type="number" inputmode="numeric" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Reps" />
-                                            <span class="text-muted-gray small">회</span>
-                                        </div>
-                                    </div>
-                                }
-                            }
-
-                            <div class="d-flex gap-4 mt-2.5 justify-content-center border-top-dark pt-2.5" style="font-size: 11px;">
-                                <span class="text-danger cursor-pointer hover-opacity select-none" @onclick="() => RemoveSet(index)">— 세트삭제</span>
-                                <span class="text-neon cursor-pointer hover-opacity select-none" @onclick="() => AddSet(index)">＋ 세트추가</span>
-                            </div>
-                        </div>
+                    <div class="text-center py-5 my-4 bg-darker rounded-4 border-dashed">
+                        <p class="text-muted-gray small m-0">아래 버튼을 눌러<br />루틴에 포함할 운동을 추가하세요.</p>
                     </div>
                 }
+                else
+                {
+                    @for (int i = 0; i < State.EditingRoutine.Exercises.Count; i++)
+                    {
+                        var index = i;
+                        var ex = State.EditingRoutine.Exercises[index];
+                        if (ex == null) continue;
+                        var currentExId = ex.Id;
+
+                        <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4">
+
+                            <div class="swipe-delete-action bg-danger d-flex align-items-center px-3 position-absolute start-0 top-0 h-100 cursor-pointer @(swipedExerciseId == currentExId ? "active" : "")"
+                                 @onclick="() => State.RemoveExerciseFromEditing(currentExId)">
+                                <span class="text-white fw-bold" style="font-size:11px;">종목<br />삭제</span>
+                            </div>
+
+                            <div class="card premium-card border-0 m-0 position-relative transition-transform @(swipedExerciseId == currentExId ? "swiped" : "")"
+                                 style="z-index: 10;"
+                                 @onpointerdown="(e) => PointerDown(e)"
+                                 @onpointerup="(e) => HandlePointerUp(e, currentExId)">
+
+                                <div class="d-flex justify-content-between align-items-center border-bottom-dark pb-2 mb-2">
+                                    <span class="fw-bold text-white font-size-14 select-none">
+                                        <span class="drag-handle me-2">☰</span>
+                                        <span class="text-neon me-1">@ex.SetNumber</span> @ex.Name
+                                    </span>
+                                    <span class="text-muted-gray" style="font-size:11px;">@ex.Category</span>
+                                </div>
+
+                                @if (ex.Sets != null)
+                                {
+                                    @for (int sIdx = 0; sIdx < ex.Sets.Count; sIdx++)
+                                    {
+                                        var currentSet = ex.Sets[sIdx];
+                                        <div class="row g-2 text-center align-items-center mb-1.5" style="font-size: 13px;">
+                                            <div class="col-2 text-muted-gray fw-bold">@currentSet.SetNumber</div>
+                                            <div class="col-5 d-flex align-items-center gap-1.5">
+                                                <input type="number" inputmode="numeric" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Weight" />
+                                                <span class="text-muted-gray small">kg</span>
+                                            </div>
+                                            <div class="col-5 d-flex align-items-center gap-1.5">
+                                                <input type="number" inputmode="numeric" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Reps" />
+                                                <span class="text-muted-gray small">회</span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                                <div class="d-flex gap-4 mt-2.5 justify-content-center border-top-dark pt-2.5" style="font-size: 11px;">
+                                    <span class="text-danger cursor-pointer hover-opacity select-none" @onclick="() => RemoveSet(index)">— 세트삭제</span>
+                                    <span class="text-neon cursor-pointer hover-opacity select-none" @onclick="() => AddSet(index)">＋ 세트추가</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+            catch (Exception renderException)
+            {
+                <div class="p-3 my-3 bg-danger text-white rounded-4 text-start" style="font-size: 11px; font-family: monospace; z-index: 99999; position: relative;">
+                    <h6 class="fw-bold text-warning" style="margin: 0 0 5px 0;">[렌더링 실시간 런타임 에러 포착]</h6>
+                    <p style="margin: 0 0 5px 0; font-weight: bold;">@renderException.Message</p>
+                    <pre style="white-space: pre-wrap; font-size: 9px; color: #FFCCCC; margin: 0;">@renderException.StackTrace</pre>
+                </div>
             }
         </div>
 
