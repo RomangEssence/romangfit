@@ -1,7 +1,7 @@
 @using romangfit.Models
 @inject Services.WorkoutStateService State
 
-<div class="view-panel dark-theme-bg p-3 d-flex flex-column h-100">
+<div class="view-panel dark-theme-bg w-100 h-100">
     @if (State.EditingRoutine == null)
     {
         <div class="text-center py-5 m-auto">
@@ -11,16 +11,14 @@
     }
     else
     {
-        <!-- 상단 헤더 -->
-        <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
-            <span class="fs-4 cursor-pointer text-light-gray touch-target" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+        <div class="header-zone d-flex align-items-center justify-content-between px-3 mb-2">
+            <span class="fs-4 cursor-pointer text-light-gray select-none touch-target" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
             <input type="text" class="form-control mx-3 fw-bold text-center dark-input rounded-3"
                    style="font-size:15px; height: 38px;" @bind="State.EditingRoutine.Name" placeholder="루틴 이름" />
-            <span class="small fw-bold text-neon cursor-pointer text-nowrap touch-target" style="flex-shrink: 0; min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
+            <span class="small fw-bold text-neon cursor-pointer text-nowrap touch-target select-none" style="min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
         </div>
 
-        <!-- 운동 목록 편집 리스트 -->
-        <div class="flex-fill scroll-container pb-5">
+        <div class="scroll-container px-3">
             @if (State.EditingRoutine.Exercises == null || !State.EditingRoutine.Exercises.Any())
             {
                 <div class="text-center py-5 my-4 bg-darker rounded-4 border-dashed">
@@ -37,25 +35,23 @@
                     var currentExId = ex.Id;
 
                     <div class="swipe-container position-relative mb-3 overflow-hidden rounded-4"
-                          draggable="true"
-                          @ondragstart="() => HandleDragStart(index)"
-                          @ondragover:preventDefault
-                          @ondragdrop="() => HandleDrop(index)">
+                         draggable="true"
+                         @ondragstart="() => HandleDragStart(index)"
+                         @ondragover:preventDefault
+                         @ondragdrop="() => HandleDrop(index)">
 
-                        <!-- 스와이프 삭제 액션 -->
                         <div class="swipe-delete-action bg-danger d-flex align-items-center px-3 position-absolute start-0 top-0 h-100 cursor-pointer @(swipedExerciseId == currentExId ? "active" : "")"
                              @onclick="() => State.RemoveExerciseFromEditing(currentExId)">
                             <span class="text-white fw-bold" style="font-size:11px;">종목<br />삭제</span>
                         </div>
 
-                        <!-- 개별 운동 설계 카드 -->
                         <div class="card premium-card border-0 m-0 position-relative transition-transform @(swipedExerciseId == currentExId ? "swiped" : "")"
                              style="z-index: 10;"
                              @onpointerdown="(e) => PointerDown(e)"
                              @onpointerup="(e) => HandlePointerUp(e, currentExId)">
 
                             <div class="d-flex justify-content-between align-items-center border-bottom-dark pb-2 mb-2">
-                                <span class="fw-bold text-white font-size-14" style="cursor: grab;">
+                                <span class="fw-bold text-white font-size-14 select-none" style="cursor: grab;">
                                     <span class="drag-handle me-2">☰</span>
                                     <span class="text-neon me-1">@ex.SetNumber</span> @ex.Name
                                 </span>
@@ -70,21 +66,20 @@
                                     <div class="row g-2 text-center align-items-center mb-1.5" style="font-size: 13px;">
                                         <div class="col-2 text-muted-gray fw-bold">@currentSet.SetNumber</div>
                                         <div class="col-5 d-flex align-items-center gap-1.5">
-                                            <input type="number" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Weight" />
+                                            <input type="number" inputmode="numeric" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Weight" />
                                             <span class="text-muted-gray small">kg</span>
                                         </div>
                                         <div class="col-5 d-flex align-items-center gap-1.5">
-                                            <input type="number" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Reps" />
+                                            <input type="number" inputmode="numeric" class="form-control form-control-sm text-center dark-set-input fw-bold" @bind="currentSet.Reps" />
                                             <span class="text-muted-gray small">회</span>
                                         </div>
                                     </div>
                                 }
                             }
 
-                            <!-- 세트 관리 조작계 -->
                             <div class="d-flex gap-4 mt-2.5 justify-content-center border-top-dark pt-2.5" style="font-size: 11px;">
-                                <span class="text-danger cursor-pointer hover-opacity" @onclick="() => RemoveSet(index)">— 세트삭제</span>
-                                <span class="text-neon cursor-pointer hover-opacity" @onclick="() => AddSet(index)">＋ 세트추가</span>
+                                <span class="text-danger cursor-pointer hover-opacity select-none" @onclick="() => RemoveSet(index)">— 세트삭제</span>
+                                <span class="text-neon cursor-pointer hover-opacity select-none" @onclick="() => AddSet(index)">＋ 세트추가</span>
                             </div>
                         </div>
                     </div>
@@ -92,9 +87,8 @@
             }
         </div>
 
-        <!-- 하단 액션 트레이 -->
         <div class="bottom-action-tray p-3 dark-glass border-top-dark">
-            <div class="row g-2 mb-3">
+            <div class="row g-2 mb-2">
                 <div class="col-6">
                     <button type="button" class="btn btn-neon-outline w-100 py-2.5 rounded-3 fw-bold small"
                             @onclick='() => State.ChangeView("ExerciseSearch")'>
@@ -115,12 +109,54 @@
 </div>
 
 <style>
+    /* 전체 패널 레이아웃 Flex 격리 체계화 */
+    .view-panel {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* 상단 헤더존 - 아이폰 노치(상단 상태바) 여백 계산 및 수축 방지 */
+    .header-zone {
+        height: calc(45px + env(safe-area-inset-top));
+        padding-top: env(safe-area-inset-top);
+        flex-shrink: 0;
+        z-index: 101;
+    }
+
+    /* 본문 스크롤 영역만 깔끔하게 유동적으로 크기 배정 */
+    .scroll-container {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* 하단 고정 트레이 높이(약 135px) + 아이폰 하단 홈 바 여백만큼 띄워서 가려짐 방지 */
+        padding-bottom: calc(145px + env(safe-area-inset-bottom)) !important;
+    }
+
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* 하단 트레이 고정 및 아이폰 홈바 대응 */
+    .bottom-action-tray {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 100;
+        flex-shrink: 0;
+        /* 아이폰 최하단 가로 인디케이터 바 여백 확보 */
+        padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    }
+
     .dark-theme-bg {
         background-color: var(--bg-dark) !important;
     }
 
     .text-light-gray {
-        color: var(--text-light-gray) !important;
+        color: #A0AEC0 !important;
     }
 
     .text-muted-gray {
@@ -152,43 +188,38 @@
         border: 1px solid var(--border-light) !important;
         color: var(--text-primary) !important;
     }
-    .dark-input:focus {
-        border-color: var(--neon-green) !important;
-        box-shadow: none !important;
-    }
+
+        .dark-input:focus {
+            border-color: var(--neon-green) !important;
+            box-shadow: none !important;
+        }
 
     .dark-set-input {
         background-color: var(--bg-dark);
         border: 1px solid var(--border-light);
         color: var(--text-primary);
     }
-    .dark-set-input:focus {
-        border-color: var(--neon-green);
-        box-shadow: none;
-    }
+
+        .dark-set-input:focus {
+            border-color: var(--neon-green);
+            box-shadow: none;
+        }
 
     .drag-handle {
         color: #5A6573;
         cursor: grab;
     }
 
-    .bottom-action-tray {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 100;
-    }
-
     .dark-glass {
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(12px);
-        border-top: 1px solid var(--border-light);
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
     }
 
     .swipe-container {
-        min-height: 120px;
+        min-height: 100px;
         background-color: rgba(255, 77, 77, 0.05);
+        flex-shrink: 0;
     }
 
     .swipe-delete-action {
@@ -200,9 +231,9 @@
         text-align: center;
     }
 
-    .swipe-delete-action.active {
-        opacity: 1;
-    }
+        .swipe-delete-action.active {
+            opacity: 1;
+        }
 
     .premium-card.swiped {
         transform: translateX(75px);
@@ -210,14 +241,6 @@
 
     .font-size-14 {
         font-size: 14px;
-    }
-
-    .scroll-container {
-        overflow-y: auto;
-        scrollbar-width: none;
-    }
-    .scroll-container::-webkit-scrollbar {
-        display: none;
     }
 
     .border-secondary-dark {
@@ -236,7 +259,7 @@
     .spinner-border.text-neon {
         color: var(--neon-green) !important;
     }
-    /* 터치 영역 강제 확장 클래스 */
+
     .touch-target {
         position: relative;
         display: inline-flex;
@@ -244,13 +267,18 @@
         justify-content: center;
     }
 
-    .touch-target::after {
-        content: '';
-        position: absolute;
-        top: -18px;
-        bottom: -18px;
-        left: -18px;
-        right: -18px;
+        .touch-target::after {
+            content: '';
+            position: absolute;
+            top: -18px;
+            bottom: -18px;
+            left: -18px;
+            right: -18px;
+        }
+
+    .select-none {
+        user-select: none;
+        -webkit-user-select: none;
     }
 </style>
 
