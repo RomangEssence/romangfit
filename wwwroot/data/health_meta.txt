@@ -1,6 +1,6 @@
 [가슴]
-디클라인-푸시업 - 디클라인 푸시업
-무릎-푸시업 - 무릎 푸시업
+디클라인-푸시업 - 디클라인 푸시업 x 
+무릎-푸시업 - 무릎 푸시업 x
 BB_BP - 벤치프레스
 SM_BP - 스미스머신 벤치프레스
 SM_INC_PRESS - 스미스머신 인클라인 벤치프레스
@@ -8,43 +8,43 @@ DB_BP - 덤벨 벤치프레스
 DB_INC_BP - 인클라인 덤벨 벤치프레스
 DB_FLY - 덤벨 플라이
 BB_INC_PRESS - 인클라인 벤치프레스
-DIPS - 딥스
-WEI_DIPS - 중량 딥스
-DB_INC_FLY - 인클라인 덤벨 플라이
-PUSH_UP - 푸시업
-WEI_PUSH_UP - 중량 푸시업
+DIPS - 딥스 x
+WEI_DIPS - 중량 딥스 x
+DB_INC_FLY - 인클라인 덤벨 플라이 x
+PUSH_UP - 푸시업 x
+WEI_PUSH_UP - 중량 푸시업 x
 HINDU_PUSH_UP - 힌두 푸시업
-ARCHER_PUSH_UP - 아처 푸시업
-CG_PUSH_UP - 클로즈그립 푸시업
-CHEST_PRESS_MC - 체스트 프레스 머신
-PEC_DECK_MC - 펙덱 플라이 머신
+ARCHER_PUSH_UP - 아처 푸시업 x
+CG_PUSH_UP - 클로즈그립 푸시업 x
+CHEST_PRESS_MC - 체스트 프레스 머신 x
+PEC_DECK_MC - 펙덱 플라이 머신 x
 INC_BP_MAC - 인클라인 벤치프레스 머신
 DB_PULLOVER - 덤벨 풀오버
-SEAT_DIPS_MC - 시티드 딥스 머신
-LP_CABLE_FLY - 로우 풀리 케이블 플라이
+SEAT_DIPS_MC - 시티드 딥스 머신 x 
+LP_CABLE_FLY - 로우 풀리 케이블 플라이 x 
 HAMMER_BP - 해머 벤치프레스
-SPOTO_BP - 스포토 벤치프레스
+SPOTO_BP - 스포토 벤치프레스 x 
 ASS_DIP_MC - 어시스트 딥스 머신
-BB_DEC_BP - 디클라인 벤치프레스
+BB_DEC_BP - 디클라인 벤치프레스 x 
 BB_FLOOR_PRESS - 바벨 플로어 프레스
-CLAP_PUSH_UP - 클랩 푸시업
+CLAP_PUSH_UP - 클랩 푸시업 x
 DB_DEC_FLY - 디클라인 덤벨 플라이
-INC_PUSH_UP - 인클라인 푸시업
-PIKE_PUSH_UP - 파이크 푸시업
+INC_PUSH_UP - 인클라인 푸시업 x 
+PIKE_PUSH_UP - 파이크 푸시업 x 
 DEC_CHEST_MAC - 디클라인 체스트 프레스 머신
-INC_DB_TWIST_PRESS - 인클라인 덤벨 트위스트 프레스
+INC_DB_TWIST_PRESS - 인클라인 덤벨 트위스트 프레스 x
 INC_CABLE_FLY - 인클라인 케이블 플라이
 DB_SQUEEZE_PRESS - 덤벨 스퀴즈 프레스
 
 [팔]
-DB_TRI_EXT - 덤벨 트라이셉 익스텐션
+DB_TRI_EXT - 덤벨 트라이셉 익스텐션 x 
 DB_KICKBACK - 덤벨 킥백
 CABLE_PUSH_DOWN - 케이블 푸시 다운
 BB_BC_CURL - 바벨 컬
 EZB_CURL - 이지바 컬
-DB_HAM_CURL - 덤벨 해머 컬
+DB_HAM_CURL - 덤벨 해머 컬 x 
 CG_BB_BP - 클로즈 그립 벤치프레스
-SEAT_DB_TRI_EXT - 시티드 덤벨 트라이셉 익스텐션
+SEAT_DB_TRI_EXT - 시티드 덤벨 트라이셉 익스텐션 x
 CABLE_TRI_EXT - 케이블 트라이셉 익스텐션
 BB_WRIST_CURL - 바벨 리스트 컬
 EZB_WRIST_CURL - 이지바 리스트 컬
@@ -53,61 +53,61 @@ SKULL_CRUSH - 스컬 크러셔
 LYING_TRI_EXT - 바벨 라잉 트라이셉 익스텐션
 DB_PREA_CURL - 덤벨 프리쳐 컬
 BB_PREA_CURL - 바벨 프리쳐 컬
-EZ_PREA_CURL - 이지바 프리쳐 컬
+EZ_PREA_CURL - 이지바 프리쳐 컬 x
 PREA_CURL_MAC - 프리쳐 컬 머신
-ARM_CURL_MC - 암 컬 머신
+ARM_CURL_MC - 암 컬 머신 x
 CABLE_HAM_CURL - 케이블 해머컬
-CABLE_OHT_EXT - 케이블 오버헤드 트라이셉 익스텐션
-CABLE_LYING_TRI_EXT - 케이블 라잉 트라이셉 익스텐션
+CABLE_OHT_EXT - 케이블 오버헤드 트라이셉 익스텐션 x
+CABLE_LYING_TRI_EXT - 케이블 라잉 트라이셉 익스텐션 x
 REV_BB_WRIST_CURL - 리버스 바벨 리스트 컬
 REV_DB_WRIST_CURL - 리버스 덤벨 리스트 컬
 INC_DB_CURL - 인클라인 덤벨 컬
 BENCH_DIPS - 벤치 딥스
-WRIST_ROLLER - 리스트 롤러
+WRIST_ROLLER - 리스트 롤러 x
 REV_BB_CURL - 리버스 바벨 컬
 TRI_EXT_MC - 트라이셉 익스텐션 머신
 
 [복근]
 SIT_UP - 싯업
-브이-업 - 브이 업
+브이-업 - 브이 업 x
 CRUNCH - 크런치
 HEEL_TOUCH - 힐 터치
-LEG_RAISE - 레그 레이즈
-HANG_LEG_RAIGE - 행잉 레그 레이즈
-러시안-트위스트 - 러시안 트위스트
-HOLLOW_ROCK - 할로우 락
+LEG_RAISE - 레그 레이즈 x
+HANG_LEG_RAIGE - 행잉 레그 레이즈 x
+러시안-트위스트 - 러시안 트위스트 x
+HOLLOW_ROCK - 할로우 락 x
 HOLLOW_POS - 할로우 포지션
-PLANK-2 - 플랭크
-DB_SIDE_BEND - 덤벨 사이드 벤드
-ABS_ROLL_OUT - 복근 롤아웃
+PLANK - 플랭크
+DB_SIDE_BEND - 덤벨 사이드 벤드 x
+ABS_ROLL_OUT - 복근 롤아웃 x
 ABS_AIR_BIKE - 복근 에어 바이크
-토즈투-바 - 토즈투 바
+토즈투-바 - 토즈투 바 x
 HANG_KNEE_RAISE - 행잉 니 레이즈
-ABS_CRUNCH_MC - 복근 크런치 머신
-케이블-크런치 - 케이블 크런치
+ABS_CRUNCH_MC - 복근 크런치 머신 x
+케이블-크런치 - 케이블 크런치 x
 PIL_JACKKNIFE - 필라테스 잭나이프
 REV_CRUNCH - 리버스 크런치
 SIDE_PLANK - 사이드 플랭크
 45_SIDE_BEND - 45도 사이드 플랭크
-RKC_PLANK - RKC 플랭크
+RKC_PLANK - RKC 플랭크 x
 CABLE_SIDE_BEND - 케이블 사이드 벤드
-디클라인-크런치 - 디클라인 크런치
+디클라인-크런치 - 디클라인 크런치 x
 WEI_DEC_CRUNCH - 중량 디클라인 크런치
 DEC_REV_CRUNCH - 디클라인 리버스 크런치
 DEC_SIT_UP - 디클라인 싯업
 WEI_DEC_SIT_UP - 중량 디클라인 싯업
 SIDE_CRUNCH - 사이드 크런치
-CABLE_TWIST - 케이블 트위스트
-업도미널-힙-쓰러스트 - 업도미널 힙 쓰러스트
-중량-업도미널-힙-쓰러스트 - 중량 업도미널 힙 쓰러스트
-토르소-로테이션-머신 - 토르소 로테이션 머신
-시티드-니업 - 시티드 니업
-복근-코스터-머신 - 복근 코스터 머신
-플랭크-트위스트 - 플랭크 트위스트
-데드버그 - 데드버그
-버드독 - 버드독
-캡틴스-체어-니-레이즈 - 캡틴스 체어 니 레이즈
-캣-카우-스트레치 - 캣 카우 스트레치
+CABLE_TWIST - 케이블 트위스트 x
+업도미널-힙-쓰러스트 - 업도미널 힙 쓰러스트 x
+중량-업도미널-힙-쓰러스트 - 중량 업도미널 힙 쓰러스트 x
+토르소-로테이션-머신 - 토르소 로테이션 머신 x
+시티드-니업 - 시티드 니업 x
+복근-코스터-머신 - 복근 코스터 머신 x
+플랭크-트위스트 - 플랭크 트위스트 x
+데드버그 - 데드버그 x
+버드독 - 버드독 x
+캡틴스-체어-니-레이즈 - 캡틴스 체어 니 레이즈 x
+캣-카우-스트레치 - 캣 카우 스트레치 x
 
 [등]
 DB_LOW - 덤벨 로우
@@ -116,33 +116,33 @@ CABLE_ARM_PULL_DOWN - 케이블 암 풀다운
 SEATED_CABLE_ROW - 시티드 케이블 로우
 GOOD_MORN - 굿모닝 엑서사이즈
 PULL_UP - 풀업
-WEI_PULL_UP - 중량 풀업
-CHIN_UP - 친업
+WEI_PULL_UP - 중량 풀업 x
+CHIN_UP - 친업 x
 WEI_CHIN_UP - 중량 친업
 INC_BB_ROW - 인클라인 바벨 로우
-INC_DB_ROW - 인클라인 덤벨 로우
+INC_DB_ROW - 인클라인 덤벨 로우 x
 INVT_ROW - 인버티드 로우
 BB_PULLOVER - 바벨 풀오버
 MC_LOW - 시티드 로우 머신
-LAT_PULL_DOWN - 랫풀다운
-WEI_HPET - 중량 하이퍼 익스텐션
+LAT_PULL_DOWN - 랫풀다운 x
+WEI_HPET - 중량 하이퍼 익스텐션 x
 BACK_ET - 백 익스텐션
-T_BAR_ROW_MAC - 티바 로우 머신
-MAG_LAT_PULL_DOWN - 맥그립 랫풀다운
-PAR_LAT_PULL_DOWN - 패러럴그립 랫풀다운
-REV_LAT_PULL_DOWN - 언더그립 랫풀다운
+T_BAR_ROW_MAC - 티바 로우 머신 x
+MAG_LAT_PULL_DOWN - 맥그립 랫풀다운 x
+PAR_LAT_PULL_DOWN - 패러럴그립 랫풀다운 x
+REV_LAT_PULL_DOWN - 언더그립 랫풀다운 x
 PAUSE_BB_ROW - 정지 바벨 로우
 ASS_PULLUP_MC - 어시스트 풀업 머신
-FLOOR_SEATED_ROW - 플로어 시티드 케이블 로우
+FLOOR_SEATED_ROW - 플로어 시티드 케이블 로우 x
 REV_BB_ROW - 언더그립 바벨 로우
-LYING_BB_ROW - 라잉 바벨 로우
-BHD_NECK_PULL_DOWN - 비하인드 넥 풀다운
+LYING_BB_ROW - 라잉 바벨 로우 x
+BHD_NECK_PULL_DOWN - 비하인드 넥 풀다운 x
 CABLE_OA_PULL_DOWN - 원암 케이블 풀다운
 OA_LAT_WIDE_PULL_DOWN - 원암 레터럴 와이드 풀다운
 LOW_ROW_MC - 로우 로우 머신
-OA_LOW_ROW_MC - 원암 로우 로우 머신
+OA_LOW_ROW_MC - 원암 로우 로우 머신 x
 HIGH_ROW_MC - 하이 로우 머신
-UNDER_HIGH_ROW_MC - 언더그립 하이 로우 머신
+UNDER_HIGH_ROW_MC - 언더그립 하이 로우 머신 x
 OA_HIGH_ROW_MC - 원암 하이 로우 머신
 OA_CABLE_SEATED_ROW - 원암 시티드 케이블 로우
 
@@ -153,38 +153,38 @@ SM_SHRUG - 스미스머신 슈러그
 DB_SHD_PRESS - 덤벨 숄더 프레스
 DB_LAT_RAISE - 덤벨 레터럴 레이즈
 DB_BO_LAT_RAISE - 벤트오버 덤벨 레터럴 레이즈
-ARNOLD_DB_PRESS - 아놀드 덤벨 프레스
+ARNOLD_DB_PRESS - 아놀드 덤벨 프레스 x
 SHD_PRESS_MAC - 숄더 프레스 머신
 BB_BHD_NECK_PRESS - 비하인드 넥 프레스
-DB_F_RAISE - 덤벨 프론트 레이즈
+DB_F_RAISE - 덤벨 프론트 레이즈 x
 DB_SHRUG - 덤벨 슈러그
 BB_SHRUG - 바벨 슈러그
-FACE_PULL - 페이스 풀
-HS - 핸드스탠드
+FACE_PULL - 페이스 풀 x
+HS - 핸드스탠드 x
 HSPU - 핸드스탠드 푸시업
 CABLE_REV_FLY - 케이블 리버스 플라이
-BB_UPRIGHT_ROW - 바벨 업라이트 로우
-DB_UPRIGHT_ROW - 덤벨 업라이트 로우
-EZB_UPRIGHT_ROW - 이지바 업라이트 로우
+BB_UPRIGHT_ROW - 바벨 업라이트 로우 x
+DB_UPRIGHT_ROW - 덤벨 업라이트 로우 x
+EZB_UPRIGHT_ROW - 이지바 업라이트 로우 x
 PUSH_PRESS - 푸시 프레스
 REV_PEC_DECK_MC - 리어 델토이드 플라이 머신
-LAT_RAISE_MC - 레터럴 레이즈 머신
+LAT_RAISE_MC - 레터럴 레이즈 머신 x
 CABLE_LAT_RAISE - 케이블 레터럴 레이즈
 CABLE_FRONT_RAISE - 케이블 프론트 레이즈
 EZB_FRONT_RAISE - 이지바 프론트 레이즈
 DB_REAR_LAT_RAISE - 시티드 덤벨 리어 레터럴 레이즈
 SHD_TAP - 숄더 탭
 SEAT_BB_SHD_PRESS - 시티드 바벨 숄더 프레스
-SEAT_DB_SHD_PRESS - 시티드 덤벨 숄더 프레스
+SEAT_DB_SHD_PRESS - 시티드 덤벨 숄더 프레스 x
 PLATE_SHD_PRESS - 플레이트 숄더 프레스
 Y_RAISE - Y 레이즈
 DB_Y_RAISE - 덤벨 Y 레이즈
 SHRUG_MC - 슈러그 머신
 CABLE_SHRUG - 케이블 슈러그
 CABLE_INT_ROT - 케이블 인터널 로테이션
-CABLE_EXT_ROT - 케이블 익스터널 로테이션
+CABLE_EXT_ROT - 케이블 익스터널 로테이션 x
 OA_CABLE_LAT_RAISE - 원암 케이블 레터럴 레이즈
-LAND_PRESS - 랜드마인 프레스
+LAND_PRESS - 랜드마인 프레스 x
 OA_LAND_PRESS - 원암 랜드마인 프레스
 
 [하체]
@@ -197,130 +197,130 @@ DB_LUNGE - 덤벨 런지
 GOBLET_SQT - 덤벨 고블릿 스쿼트
 DB_STIFF_DL - 덤벨 스티프 레그 데드리프트
 BB_FSQ - 프론트 스쿼트
-ZER_SQT - 저처 스쿼트
+ZER_SQT - 저처 스쿼트 x
 BB_SPLIT_SQT - 바벨 불가리안 스플릿 스쿼트
 DB_BULSPLIT_SQT - 덤벨 불가리안 스플릿 스쿼트
 DB_SPLIT_SQT - 덤벨 스플릿 스쿼트
 BW_SPLIT_SQT - 맨몸 스플릿 스쿼트
 AIR_SQT - 에어 스쿼트
 JUMP_SQT - 점프 스쿼트
-KB_GOBLET_SQT - 케틀벨 고블릿 스쿼트
-RM_BB_DL - 루마니안 데드리프트
+KB_GOBLET_SQT - 케틀벨 고블릿 스쿼트 x
+RM_BB_DL - 루마니안 데드리프트 x
 SM_BB_DL - 스모 데드리프트
-LEG_PRESS - 레그 프레스
+LEG_PRESS - 레그 프레스 x
 LEG_CURL - 레그 컬
 LGE_EXT - 레그 익스텐션
 STD_CALF_RAISE - 스탠딩 카프 레이즈
-INN_THIGH_MC - 이너 싸이 머신
+INN_THIGH_MC - 이너 싸이 머신 x
 LUNGE - 런지
 STEP_UP - 스텝업
 WEI_STEP_UP - 중량 스텝업
-HIP_THRUST - 힙 쓰러스트
+HIP_THRUST - 힙 쓰러스트 x
 WEI_HIP_THRUST - 바벨 힙 쓰러스트
-V_SQT - 브이 스쿼트
+V_SQT - 브이 스쿼트 x
 REV_V_SQT - 리버스 브이 스쿼트
 GLUTE_KB_MC - 글루트 킥백 머신
 HIP_ABD_MC - 힙 어브덕션 머신
-힙-어덕션-머신 - 힙 어덕션 머신
-SEAT_CALF_RAISE - 시티드 카프 레이즈
+힙-어덕션-머신 - 힙 어덕션 머신 x
+SEAT_CALF_RAISE - 시티드 카프 레이즈 x
 PAUSE_SQT - 정지 백 스쿼트
-TRAP_DL - 트랩바 데드리프트
+TRAP_DL - 트랩바 데드리프트 x
 CABLE_HIP_ABD - 케이블 힙 어브덕션
-HACK_SQT - 핵 스쿼트 머신
-PAUSE_DL - 정지 데드리프트
-PAUSE_SM_DL - 정지 스모 데드리프트
+HACK_SQT - 핵 스쿼트 머신 x
+PAUSE_DL - 정지 데드리프트 x
+PAUSE_SM_DL - 정지 스모 데드리프트 x
 BB_BOX_SQT - 바벨 박스 스쿼트
 BB_FR_LUNGE - 바벨 프론트 랙 런지
-BB_JUMP_SQT - 바벨 점프 스쿼트
+BB_JUMP_SQT - 바벨 점프 스쿼트 x
 BB_LUNGE - 바벨 런지
 BB_LAT_LUNGE - 바벨 레터럴 런지
 BB_SPLIT_SQT_REAL - 바벨 스플릿 스쿼트
-BB_STD_CALF_RAISE - 바벨 스탠딩 카프 레이즈
+BB_STD_CALF_RAISE - 바벨 스탠딩 카프 레이즈 x
 STIFF_DL - 스티프 레그 데드리프트
-BW_OH_SQT - 맨몸 오버헤드 스쿼트
+BW_OH_SQT - 맨몸 오버헤드 스쿼트 x
 DB_SM_SQT - 덤벨 스모 스쿼트
 DB_LEG_CURL - 덤벨 레그 컬
 DB_SQT - 덤벨 스쿼트
-BB_HACK_SQT - 바벨 핵 스쿼트
-SEAT_LEG_CURL - 시티드 레그 컬
+BB_HACK_SQT - 바벨 핵 스쿼트 x
+SEAT_LEG_CURL - 시티드 레그 컬 x
 HIP_THRUST_MAC - 힙 쓰러스트 머신
 BW_CALF_RAISE - 맨몸 카프 레이즈
 GLUTE_BRDG - 글루트 브릿지
 DB_RM_DL - 덤벨 루마니안 데드리프트
 LYING_HIP_ABD - 라잉 힙 어브덕션
 SL_GLUTE_BRDG - 싱글 레그 글루트 브릿지
-PISTOL_BOX_SQT - 피스톨 박스 스쿼트
-SIDE_LYING_CLAM - 사이드 라잉 클램
+PISTOL_BOX_SQT - 피스톨 박스 스쿼트 x
+SIDE_LYING_CLAM - 사이드 라잉 클램 x
 BW_SL_DEAD - 맨몸 원레그 데드리프트
 BB_SL_DEAD - 바벨 원레그 데드리프트
-DB_SL_DEAD - 덤벨 원레그 데드리프트
+DB_SL_DEAD - 덤벨 원레그 데드리프트 x
 KB_DL - 케틀벨 데드리프트
-KB_SM_DL - 케틀벨 스모 데드리프트
-DB_SM_DL - 덤벨 스모 데드리프트
+KB_SM_DL - 케틀벨 스모 데드리프트 x
+DB_SM_DL - 덤벨 스모 데드리프트 x
 DB_LAT_LUNGE - 덤벨 레터럴 런지
-KB_LAT_LUNGE - 케틀벨 레터럴 런지
-BW_LAT_LUNGE - 맨몸 레터럴 런지
+KB_LAT_LUNGE - 케틀벨 레터럴 런지 x
+BW_LAT_LUNGE - 맨몸 레터럴 런지 x
 SL_LEG_EXT - 원레그 익스텐션
 SL_LEG_CURL - 원레그 컬
-SL_LEG_PRESS - 원레그 프레스
+SL_LEG_PRESS - 원레그 프레스 x
 HZ_LEG_PRESS - 수평 레그 프레스
 HZ_SL_LEG_PRESS - 수평 원레그 프레스
 SEAT_SL_LEG_CURL - 시티드 원레그 컬
 NOR_HAM_CURL - 노르딕 햄스트링 컬
 BB_SM_SQT - 바벨 스모 스쿼트
-KB_SM_SQT - 케틀벨 스모 스쿼트
+KB_SM_SQT - 케틀벨 스모 스쿼트 x
 KB_SM_AIR_SQT - 스모 에어 스쿼트
 PISTOL_SQT - 피스톨 스쿼트
-DONK_KICK - 덩키 킥
+DONK_KICK - 덩키 킥 x
 CABLE_DONK_KICK - 케이블 덩키 킥
 DEFICIT_DL - 데피싯 데드리프트
 LUNGE_TWIST - 런지 트위스트
-KB_LUNGE_TWIST - 케틀벨 런지 트위스트
+KB_LUNGE_TWIST - 케틀벨 런지 트위스트 x
 CABLE_PULL_THRU - 케이블 풀 스루
 MON_GLUTE_MC - 몬스터 글루트 머신
-파이어-하이드런트 - 파이어 하이드런트
+파이어-하이드런트 - 파이어 하이드런트 x
 
 [역도]
 BB_CLEAN - 클린
-BB_CNJ - 클린 & 저크
+BB_CNJ - 클린 & 저크 x
 BB_JERK - 저크
-BB_SNATCH - 스내치
-BB_OH_SQT - 바벨 오버헤드 스쿼트
+BB_SNATCH - 스내치 x
+BB_OH_SQT - 바벨 오버헤드 스쿼트 x
 DB_SNATCH - 덤벨 스내치
 KB_SNATCH - 케틀벨 스내치
 BB_SNATCH_BAL - 스내치 밸런스
-WEI_HANG_KNEE_RAISE - 중량 행잉 니 레이즈
-HANG_CLEAN - 행 클린
+WEI_HANG_KNEE_RAISE - 중량 행잉 니 레이즈 x
+HANG_CLEAN - 행 클린 x
 HANG_SNATCH - 행 스내치
-CLEAN_HIGH_PULL - 클린 하이풀
+CLEAN_HIGH_PULL - 클린 하이풀 x
 SNATCH_HIGH_PULL - 스내치 하이풀
 
 [유산소]
 TREADMIL - 트레드밀
-CYCLE - 싸이클
+CYCLE - 싸이클 x
 ROW_MACH - 로잉 머신
 CLIMB_STAIRS - 계단 오르기
-JUMP_ROPE - 줄넘기
+JUMP_ROPE - 줄넘기 x
 DOUBLE_UNDER - 이단 뛰기
 HIGH_KNEE_SKIP - 하이니 스킵
-ASSAULT_BIKE - 어썰트 바이크
+ASSAULT_BIKE - 어썰트 바이크 x
 STEPMILL_MAC - 스텝밀
 WALKING - 걷기
-RUNNING - 달리기
+RUNNING - 달리기 x
 
 [기타]
-THRUSTER - 쓰러스터
-BURPEE - 버피
+THRUSTER - 쓰러스터 x
+BURPEE - 버피 x
 KB_SWING - 케틀벨 스윙
 FARMER_WALK - 파머스 워크
 WB_SHOT - 월볼 샷
 MOUNT_CLIMB - 마운틴 클라이머
-BOX_JUMP - 박스 점프
+BOX_JUMP - 박스 점프 x
 JUMPING_JACK - 점핑 잭
 BAR_MU - 바 머슬업
-RING_MU - 링 머슬업
+RING_MU - 링 머슬업 x
 DB_BURPEE - 덤벨 버피
-DB_THRUSTER - 덤벨 쓰러스터
-INCHWORM - 인치웜
-SUMO_DEAD_HIGH - 스모 데드리프트 하이풀
-KB_SUMO_HIGH - 케틀벨 스모 하이풀
+DB_THRUSTER - 덤벨 쓰러스터 
+INCHWORM - 인치웜 x
+SUMO_DEAD_HIGH - 스모 데드리프트 하이풀 x
+KB_SUMO_HIGH - 케틀벨 스모 하이풀 x

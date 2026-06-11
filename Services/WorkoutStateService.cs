@@ -824,7 +824,7 @@ public class WorkoutStateService
         catch (Exception ex)
         {
             Console.WriteLine($"Error parsing health_meta.txt: {ex.Message}");
-            SeedDefaultExerciseDefinitions();
+            //SeedDefaultExerciseDefinitions();
         }
     }
 
