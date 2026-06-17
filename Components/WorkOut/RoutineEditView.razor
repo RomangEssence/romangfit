@@ -1,4 +1,5 @@
 @using romangfit.Models
+@using romangfit.Models.Enums
 @inject Services.WorkoutStateService State
 
 <div class="view-panel dark-theme-bg w-100 h-100">
@@ -12,7 +13,7 @@
     else
     {
         <div class="header-zone d-flex align-items-center justify-content-between px-3 mb-2">
-            <span class="fs-4 cursor-pointer text-light-gray select-none touch-target" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+            <span class="fs-4 cursor-pointer text-light-gray select-none touch-target" @onclick='() => State.ChangeView(WorkoutView.RoutineSelect)'>‹</span>
             <input type="text" class="form-control mx-3 fw-bold text-center dark-input rounded-3"
                    style="font-size:15px; height: 38px;" @bind="State.EditingRoutine.Name" placeholder="루틴 이름" />
             <span class="small fw-bold text-neon cursor-pointer text-nowrap touch-target select-none" style="min-width: 35px;" @onclick="State.SaveEditingRoutineAsync">저장</span>
@@ -98,7 +99,7 @@
             <div class="row g-2 mb-2">
                 <div class="col-6">
                     <button type="button" class="btn btn-neon-outline w-100 py-2.5 rounded-3 fw-bold small"
-                            @onclick='() => State.ChangeView("ExerciseSearch")'>
+                            @onclick='() => State.ChangeView(WorkoutView.ExerciseSearch)'>
                         운동 추가
                     </button>
                 </div>

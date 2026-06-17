@@ -1,9 +1,10 @@
+@using romangfit.Models.Enums
 @inject Services.WorkoutStateService State
 
 <div class="view-panel dark-theme-bg w-100 h-100 m-0">
     <!-- 상단 헤더 영역 (Safe Area 반영) -->
     <div class="header-zone d-flex align-items-center justify-content-between px-3 mb-2">
-        <span class="fs-4 cursor-pointer text-light-gray select-none touch-target" @onclick='() => State.ChangeView("Dashboard")'>‹</span>
+        <span class="fs-4 cursor-pointer text-light-gray select-none touch-target" @onclick='() => State.ChangeView(WorkoutView.Dashboard)'>‹</span>
         <h5 class="fw-bold m-0 text-white">@DateTime.Today.ToString("M월 d일")</h5>
         <span class="fs-4 cursor-pointer text-neon fw-bold hover-glow select-none touch-target" @onclick="State.StartNewRoutineCreation">＋</span>
     </div>

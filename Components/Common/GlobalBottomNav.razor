@@ -1,11 +1,12 @@
 @inject Services.WorkoutStateService State
+@using romangfit.Models.Enums
 
 <div class="global-bottom-nav d-flex justify-content-around align-items-center dark-glass-nav">
-    <div class="nav-tab @(State.CurrentView == "Dashboard" ? "active" : "")" @onclick='() => State.ChangeView("Dashboard")'>
+    <div class="nav-tab @(State.CurrentView == WorkoutView.Dashboard ? "active" : "")" @onclick='() => State.ChangeView(WorkoutView.Dashboard)'>
         <span class="icon">📅</span>
         <span class="lbl">투데이</span>
     </div>
-    <div class="nav-tab @(State.CurrentView == "RoutineSelect" ? "active" : "")" @onclick='() => State.ChangeView("RoutineSelect")'>
+    <div class="nav-tab @(State.CurrentView == WorkoutView.RoutineSelect ? "active" : "")" @onclick='() => State.ChangeView(WorkoutView.RoutineSelect)'>
         <span class="icon">📋</span>
         <span class="lbl">내루틴</span>
     </div>
@@ -13,7 +14,7 @@
         <span class="icon">📈</span>
         <span class="lbl">분석</span>
     </div>
-    <div class="nav-tab @(State.CurrentView == "Profile" ? "active" : "")" @onclick='() => State.ChangeView("Profile")'>
+    <div class="nav-tab @(State.CurrentView == WorkoutView.Profile ? "active" : "")" @onclick='() => State.ChangeView(WorkoutView.Profile)'>
         <span class="icon">👤</span>
         <span class="lbl">프로필</span>
     </div>

@@ -1,3 +1,4 @@
+@using romangfit.Models.Enums
 @inject Services.WorkoutStateService State
 
 <div class="view-panel animated-fade d-flex flex-column justify-content-between h-100 dark-bg">
@@ -35,9 +36,9 @@
         </div>
 
         <!-- 메인 기록하기 버튼 -->
-        <div class="premium-card p-3 text-center border-0">
+        <div class="premium-card p-3 text-center border-0"> 
             <button class="btn btn-neon-primary w-100 py-3 rounded-3 fw-bold fs-6"
-                    @onclick='() => State.ChangeView("RoutineSelect")'>
+                    @onclick='() => State.ChangeView(WorkoutView.RoutineSelect)'>
                 새 운동 시작하기
             </button>
         </div>

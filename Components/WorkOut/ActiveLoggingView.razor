@@ -1,10 +1,11 @@
 @inject Services.WorkoutStateService State
 @implements IDisposable
+@using romangfit.Models.Enums
 
 <div class="view-panel dark-theme-bg p-3 d-flex flex-column h-100">
     <!-- 상단 헤더 -->
     <div class="d-flex align-items-center justify-content-between mb-3" style="height: 40px;">
-        <span class="fs-4 cursor-pointer text-light-gray" @onclick='() => State.ChangeView("RoutineSelect")'>‹</span>
+        <span class="fs-4 cursor-pointer text-light-gray" @onclick='() => State.ChangeView(WorkoutView.RoutineSelect)'>‹</span>
         <h5 class="fw-bold m-0 text-white">@DateTime.Today.ToString("M월 d일")</h5>
         <div class="text-muted-gray d-flex gap-3 fs-5">
             <span class="cursor-pointer">📅</span>
@@ -47,7 +48,7 @@
                 <div class="fs-1 mb-2 opacity-50">📋</div>
                 <h6 class="fw-bold text-muted-gray">수행할 운동이 없습니다.</h6>
                 <button class="btn btn-neon-outline btn-sm rounded-pill px-4 mt-3 fw-bold"
-                        @onclick='() => State.ChangeView("ExerciseSearch")'>
+                        @onclick='() => State.ChangeView(WorkoutView.ExerciseSearch)'>
                     ＋ 운동 추가하기
                 </button>
             </div>

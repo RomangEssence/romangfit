@@ -422,7 +422,7 @@
     private async Task ForceSync()
     {
         _isLoading = true;
-        await State.SyncWithFirebaseAsync();
+        await State.LoadDataFromFirebaseAsync();
         _isLoading = false;
     }
 

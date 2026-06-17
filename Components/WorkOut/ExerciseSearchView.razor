@@ -1,3 +1,4 @@
+@using romangfit.Models.Enums
 @inject Services.WorkoutStateService State
 
 <div class="view-panel p-3 dark-theme-bg flex-fill d-flex flex-column h-100">
@@ -128,7 +129,7 @@
                             </div>
                             
                             <div class="flex-fill">
-                                <span class="small text-muted-gray d-block mb-0.5">@currentEx.Category</span>
+                                <span class="small text-muted-gray d-block mb-0.5">@currentEx.Category.GetKoName()</span>
                                 <span class="fw-bold text-white">@currentEx.Name</span>
                                 @if (!string.IsNullOrEmpty(currentEx.TargetMuscles))
                                 {
@@ -356,7 +357,7 @@
 
     private IEnumerable<Models.ExerciseDefinition> FilteredExercises =>
         State.ExerciseDefinitions
-            .Where(e => selectedCategory == "전체" || e.Category == selectedCategory)
+            .Where(e => selectedCategory == "전체" || e.Category == selectedCategory.ToTargetMuscleFromKoName())
             .Where(e => string.IsNullOrWhiteSpace(searchText) || 
                         e.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                         (e.TargetMuscles != null && e.TargetMuscles.Contains(searchText, StringComparison.OrdinalIgnoreCase)));
@@ -398,7 +399,7 @@
         {
             Code = "CUSTOM",
             Name = newExName.Trim(),
-            Category = newExCategory,
+            Category = newExCategory.ToTargetMuscleFromKoName(),
             TargetMuscles = newExTarget.Trim(),
             Icon = string.IsNullOrWhiteSpace(newExIcon) ? "🏋️" : newExIcon.Trim(),
             Description = newExDesc.Trim(),
@@ -423,15 +424,15 @@
     {
         if (State.EditingRoutine != null)
         {
-            State.ChangeView("RoutineEdit");
+            State.ChangeView(WorkoutView.RoutineEdit);
         }
         else if (State.ActiveWorkout != null && State.ActiveWorkout.Exercises.Any())
         {
-            State.ChangeView("ActiveLogging");
+            State.ChangeView(WorkoutView.ActiveLogging);
         }
         else
         {
-            State.ChangeView("RoutineSelect");
+            State.ChangeView(WorkoutView.RoutineSelect);
         }
     }
 }

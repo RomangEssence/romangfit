@@ -1,3 +1,4 @@
+@using romangfit.Models.Enums
 @inject Services.WorkoutStateService State
 @inject IJSRuntime JS
 
@@ -8,7 +9,7 @@
         <div class="d-flex gap-3 small align-items-center">
             <span class="text-danger cursor-pointer fw-bold hover-underline" @onclick="DeleteRoutine">삭제</span>
             <span class="text-neon cursor-pointer fw-bold hover-underline" @onclick="State.EditSelectedRoutine">편집</span>
-            <span class="text-muted-gray cursor-pointer hover-opacity" @onclick='() => State.ChangeView("RoutineSelect")'>닫기</span>
+            <span class="text-muted-gray cursor-pointer hover-opacity" @onclick='() => State.ChangeView(WorkoutView.RoutineSelect)'>닫기</span>
         </div>
     </div>
 
